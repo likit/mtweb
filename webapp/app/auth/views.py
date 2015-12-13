@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for
 from app import flask_bcrypt
-from .forms import LoginForm
+from .forms import LoginForm, RegisterForm
 from .models import User
 from flask.ext.login import login_user, logout_user
 
@@ -25,7 +25,8 @@ def login():
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
-    return "Register page."
+    form = RegisterForm()
+    return render_template('auth/register.html', form=form)
 
 @auth.route('/logout')
 def logout():

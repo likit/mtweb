@@ -12,15 +12,15 @@ class LoginForm(Form):
     submit = SubmitField('Login')
 
 class RegisterForm(Form):
-    org = StringField('org', validators=[DataRequired()])
-    name = StringField('name', validators=[DataRequired()])
-    labs = SelectField('labs', choices=[('', u'โปรดกรอกชื่อหน่วยงาน')],
+    org = StringField('Organization', validators=[DataRequired()])
+    name = StringField('Name', validators=[DataRequired()])
+    labs = SelectField('Labs', choices=[('', u'โปรดกรอกชื่อหน่วยงาน')],
             validators=[DataRequired()])
-    addlab = StringField('addlab', validators=[DataRequired()])
-    lastname = StringField('lastname', validators=[DataRequired()])
-    email = StringField('email', validators=[DataRequired(), Email()])
-    password = PasswordField('password',
+    addlab = StringField('Add lab', validators=[DataRequired()])
+    lastname = StringField('Lastname', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password',
             validators=[EqualTo('password2'), DataRequired()])
-    password2 = PasswordField('password', validators=[DataRequired()])
+    password2 = PasswordField('Confirmed password', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
