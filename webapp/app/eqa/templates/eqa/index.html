@@ -4,12 +4,22 @@
         <title>MTWEB Portal</title>
     </head>
     <body>
+        {% if current_user.is_authenticated %}
+        <p><h4>You're logged in!</h4></p>
+        {% else %}
+        <p><h4>You're not logged in!</h4></p>
+        <p>Please log in or register.</p>
+        {% endif %}
         <ul>
             <li><a href={{ url_for("main.index") }}>Home</a></li>
             <li><a href={{ url_for("services.index") }}>Services</a></li>
-            <li><a href={{ url_for("auth.register") }}>Register</a></li>
-            <li><a href={{ url_for("auth.login") }}>Login</a></li>
-            <li><a href={{ url_for("auth.logout") }}>Logout</a></li>
+            {% if not current_user.is_authenticated %}
+                <li><a href={{ url_for("auth.register") }}>Register</a></li>
+                <li><a href={{ url_for("auth.login") }}>Login</a></li>
+            {% else %}
+                <li><a href={{ url_for("eqa.customer_results") }}>Customer Results</a></li>
+                <li><a href={{ url_for("auth.logout") }}>Logout</a></li>
+            {% endif %}
         </ul>
     </body>
 </html>

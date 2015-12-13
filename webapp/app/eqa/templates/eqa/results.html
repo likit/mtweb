@@ -1,0 +1,208 @@
+{% extends "bootstrap/base.html" %}
+
+{% block content %}
+<div class="col-md-12">
+    <form id="form" method="POST" action="{{ url_for('eqa.customer_results') }}">
+        {{ form.hidden_tag()  }}
+        <div class="panel panel-primary">
+            <div class="panel panel-heading"><h3 class="panel-title">All Tests</h3></div>
+            <div class="panel-body">
+                <div class="form-group">
+                    {{ form.program_id.label(for="program_id", class="col-sm-2 control-label") }}
+                    {{ form.program_id(class="form-control col-sm-10", placeholder="Please enter the program ID") }}
+                </div>
+                <table class="table table-hover">
+                    <tr>
+                        <td><strong>Test</strong></td>
+                        <td><strong>Principle/Method/Instrument</strong></td>
+                        <td><strong>Result</strong></td>
+                        <td><strong>Unit</strong></td>
+                    </tr>
+                    <tbody>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.albumin.label(for="albumin") }}</td>
+                        <td>{{ form.albumin_(class="form-control") }}</td>
+                        <td>{{ form.albumin(class="form-control") }}</td>
+                        </div>
+                        <td>g/dL</td>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.alp.label(for="alp") }}</td>
+                        <td>{{ form.alp_(class="form-control") }}</td>
+                        <td>{{ form.alp(class="form-control") }}</td>
+                        </div>
+                        <td>U/L</td>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.alt.label(for="alt") }}</td>
+                        <td>{{ form.alt_(class="form-control") }}</td>
+                        <td>{{ form.alt(class="form-control") }}</td>
+                        </div>
+                        <td>U/L</td>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.ast.label(for="ast") }}</td>
+                        <td>{{ form.ast_(class="form-control") }}</td>
+                        <td>{{ form.ast(class="form-control") }}</td>
+                        </div>
+                        <td>U/L</td>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.bun.label(for="bun") }}</td>
+                        <td>{{ form.bun_(class="form-control") }}</td>
+                        <td>{{ form.bun(class="form-control") }}</td>
+                        </div>
+                        <td>mg/dL</td>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.bilirubin.label(for="bilirubin") }}</td>
+                        <td>{{ form.bilirubin_(class="form-control") }}</td>
+                        <td>{{ form.bilirubin(class="form-control") }}</td>
+                        </div>
+                        <td>mg/dL</td>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.calcium.label(for="calcium") }}</td>
+                        <td>{{ form.calcium_(class="form-control") }}</td>
+                        <td>{{ form.calcium(class="form-control") }}</td>
+                        <td>mg/dL</td>
+                        </div>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.chloride.label(for="chloride") }}</td>
+                        <td>{{ form.chloride_(class="form-control") }}</td>
+                        <td>{{ form.chloride(class="form-control") }}</td>
+                        <td>mmol/L</td>
+                        </div>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.cholesterol.label(for="cholesterol") }}</td>
+                        <td>{{ form.cholesterol_(class="form-control") }}</td>
+                        <td>{{ form.cholesterol(class="form-control") }}</td>
+                        <td>mg/dL</td>
+                        </div>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.ck.label(for="ck") }}</td>
+                        <td>{{ form.ck_(class="form-control") }}</td>
+                        <td>{{ form.ck(class="form-control") }}</td>
+                        <td>U/L</td>
+                        </div>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.creatinine.label(for="creatinine") }}</td>
+                        <td>{{ form.creatinine_(class="form-control") }}</td>
+                        <td>{{ form.creatinine(class="form-control") }}</td>
+                        <td>mg/dL</td>
+                        </div>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.ggt.label(for="ggt") }}</td>
+                        <td>{{ form.ggt_(class="form-control") }}</td>
+                        <td>{{ form.ggt(class="form-control") }}</td>
+                        <td>U/L</td>
+                        </div>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.glucose.label }}</td>
+                        <td>{{ form.glucose_(class="form-control") }}</td>
+                        <td>{{ form.glucose(class="form-control") }}</td>
+                        <td>mg/dL</td>
+                        </div>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.hdl_chol.label(for="hdl_chol") }}</td>
+                        <td>{{ form.hdl_chol_(class="form-control") }}</td>
+                        <td>{{ form.hdl_chol(class="form-control") }}</td>
+                        <td>mg/dL</td>
+                        </div>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.ldh.label(for="ldh") }}</td>
+                        <td>{{ form.ldh_(class="form-control") }}</td>
+                        <td>{{ form.ldh(class="form-control") }}</td>
+                        <td>U/L</td>
+                        </div>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.ldl_chol.label(for="ldl_chol") }}</td>
+                        <td>{{ form.ldl_chol_(class="form-control") }}</td>
+                        <td>{{ form.ldl_chol(class="form-control") }}</td>
+                        <td>mg/dL</td>
+                        </div>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.P.label(for="P") }}</td>
+                        <td>{{ form.P_(class="form-control") }}</td>
+                        <td>{{ form.P(class="form-control") }}</td>
+                        <td>mg/dL</td>
+                        </div>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.K.label(for="K") }}</td>
+                        <td>{{ form.K_(class="form-control") }}</td>
+                        <td>{{ form.K(class="form-control") }}</td>
+                        <td>mmol/L</td>
+                        </div>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.protein.label(for="protein") }}</td>
+                        <td>{{ form.protein_(class="form-control") }}</td>
+                        <td>{{ form.protein(class="form-control") }}</td>
+                        <td>g/dL</td>
+                        </div>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.Na.label(for="Na") }}</td>
+                        <td>{{ form.Na_(class="form-control") }}</td>
+                        <td>{{ form.Na(class="form-control") }}</td>
+                        <td>mmol/L</td>
+                        </div>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.trig.label(for="trig") }}</td>
+                        <td>{{ form.trig_(class="form-control") }}</td>
+                        <td>{{ form.trig(class="form-control") }}</td>
+                        <td>mg/dL</td>
+                        </div>
+                    </tr>
+                    <tr>
+                        <div class="form-group">
+                        <td>{{ form.uric.label(for="uric") }}</td>
+                        <td>{{ form.uric_(class="form-control") }}</td>
+                        <td>{{ form.uric(class="form-control") }}</td>
+                        <td>mg/dL</td>
+                        </div>
+                    </tr>
+                    </tbody>
+                </table>
+                {{ form.comment(size=100, class="form-control", rows="3", placeholder="Please enter your comment here.") }}
+            </div>
+        </div>
+        <div class="center-block">
+        {{ form.submit(class="btn btn-lg btn-primary") }}
+        <a href="{{ url_for('eqa.index') }}" class="btn btn-lg btn-default">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

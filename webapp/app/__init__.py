@@ -1,9 +1,13 @@
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.bcrypt import Bcrypt
+from flask.ext.login import LoginManager
+from flask.ext.bootstrap import Bootstrap
 
 db = SQLAlchemy()
 flask_bcrypt = Bcrypt()
+login_manager = LoginManager()
+bootstrap = Bootstrap()
 
 def create_app(config=None):
     app = Flask(__name__)
@@ -29,5 +33,13 @@ def create_app(config=None):
 
     db.init_app(app)
     flask_bcrypt.init_app(app)
+    login_manager.init_app(app)
+    bootstrap.init_app(app)
 
     return app
+
+from app.auth.models import User
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
