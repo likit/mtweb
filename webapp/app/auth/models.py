@@ -36,3 +36,16 @@ class User(db.Model):
     @password.setter
     def password(self, password):
         self._password = flask_bcrypt.generate_password_hash(password)
+
+
+class LabInfo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    org = db.Column(db.String(255))
+    labs = db.Column(db.String(255))
+    province = db.Column(db.String(255))
+    district = db.Column(db.String(255))
+    address = db.Column(db.Text())
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship('User',
+            backref=db.backref('labinfo', lazy='dynamic'))
+    added_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
