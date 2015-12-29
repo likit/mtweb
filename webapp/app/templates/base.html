@@ -1,0 +1,169 @@
+{% extends "bootstrap/base.html" %}
+
+{% block metas %}
+{{ super() }}
+<meta charset="utf-8">
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename="jquery-1.11.3.min.js") }}"></script>
+<script src="{{ url_for('static', filename="bootstrap.js") }}"></script>
+{% endblock %}
+
+{% block styles %}
+<link rel=stylesheet href="{{ url_for('static', filename="bootstrap.css") }}">
+{% endblock %}
+
+{% block title %}MUMT Website{% endblock %}
+
+{% block navbar %}
+<div>
+    <img src="{{ url_for('static', filename="logo_en.png") }}">
+</div>
+<div class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed"
+                data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href='#'>Brand</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a class="active" href="/">Home</a></li>
+                <li><a href="#">Administration</a></li>
+                <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Departments and Centers<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-header">Department</li>
+                        <li><a href="#">Office of the Dean</a></li>
+                        <li><a href="#">Clinical Chemistry</a></li>
+                        <li><a href="#">Community Medical Technology</a></li>
+                        <li><a href="#">Clinical Microbiology and Applied Technology</a></li>
+                        <li><a href="#">Clinical Microscopy</a></li>
+                        <li><a href="#">Radiological Technology</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li class="dropdown-header">Center</li>
+                        <li><a href="#">Center of Medical Laboratory Services</a></li>
+                        <li><a href="#">Center for Standardization and Product Validation</a></li>
+                        <li><a href="#">International Center for Med and Radiol Technology</a></li>
+                        <li><a href="#">Center for Research and Innovation</a></li>
+                        <li><a href="#">Center of Data Mining and Biomedical Informatics</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Event Calendar</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Academic<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-header">Undergraduate Degree Program</li>
+                        <li><a href="#">Medical Technology</a></li>
+                        <li><a href="#">Radiological Technology</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li class="dropdown-header">Master's Degree Program</li>
+                        <li><a href="#">Medical Technology</a></li>
+                        <li><a href="#">Radiological Technology</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li class="dropdown-header">Ph.D. Degree Program</li>
+                        <li><a href="#">Medical Technology</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Apply</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Facilities</a></li>
+                        <li><a href="#">Scholarships</a></li>
+                        <li><a href="#">Academic News</a></li>
+                        <li><a href="#">Student Activities</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Research<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Research Clusters</a></li>
+                        <li><a href="#">Research Profiles</a></li>
+                        <li><a href="#">Publications</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Job Opportunity</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li class="dropdown-header">Event Calendar</li>
+                        <li><a href="#">Qualification Exams</a></li>
+                        <li><a href="#">Proposal Exams</a></li>
+                        <li><a href="#">Defense Exams</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Seminar Class</a></li>
+                        <li><a href="#">Special Seminars</a></li>
+                        <li><a href="#">Training/Workshop</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Services<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ url_for('eqa.index') }}">EQA</a></li>
+                        <li><a href="#">Health Checkup</a></li>
+                        <li><a href="#">Heavy Metals Tests</a></li>
+                        <li><a href="#">Proteomics</a></li>
+                        <li><a href="#">Mahidol Clinics</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Customer Services</a></li>
+                        <li><a href="#">Webboard</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li class="dropdown-header">Event Calendar</li>
+                        <li><a href="#">Workshop</a></li>
+                        <li><a href="#">Training</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Students<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-header">Undergraduate</li>
+                        <li><a href="#">E-learning</a></li>
+                        <li><a href="#">Class</a></li>
+                        <li><a href="#">Grade</a></li>
+                        <li><a href="#">Research</a></li>
+                        <li><a href="#">Internship</a></li>
+                        <li><a href="#">Forum</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li class="dropdown-header">Graduate</li>
+                        <li><a href="#">Research</a></li>
+                        <li><a href="#">Class</a></li>
+                        <li><a href="#">Grade</a></li>
+                        <li><a href="#">Scholarship/Funding</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Event Calendar</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Staff<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Personal Info</a></li>
+                        <li><a href="#">Reservation</a></li>
+                        <li><a href="#">One-stop Repair Services</a></li>
+                        <li><a href="#">Circulations</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Event Calendar</a></li>
+                    </ul>
+                </li>
+                <li><a href="/">Contact Us</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                {% if current_user.is_authenticated %}
+                <li><a href="{{ url_for('auth.logout') }}">Sign Out</a></li>
+                {% else %}
+                <li><a href="{{ url_for('auth.login') }}">Sign In</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+
+    {% block page_content %}
+    {% endblock %}
+</div>
+{% endblock %}
