@@ -1,8 +1,8 @@
-{% extends "bootstrap/base.html" %}
+{% extends "base.html" %}
 
-{% block content %}
+{% block page_content %}
 <div class="col-md-12">
-    <form id="form" method="POST" action="{{ url_for('eqa.customer_results') }}">
+    <form id="form" method="POST" action="{{ url_for('eqa.results') }}">
         {{ form.hidden_tag()  }}
         <div class="panel panel-primary">
             <div class="panel panel-heading"><h3 class="panel-title">All Tests</h3></div>
