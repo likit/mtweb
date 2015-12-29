@@ -1,31 +1,20 @@
-{% extends "bootstrap/base.html" %}
+{% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
-{% block content %}
-<div class="col-md-4">
+{% block page_content %}
+<div class="row">
+    <p><h4>Please enter your email and password to login.</h4></p>
     <form action="{{ url_for('auth.login')}}" method='POST'>
         {{ form.hidden_tag() }}
         {{ form.id }}
-        <div>
-            {{ form.email.label }} {{ form.email() }}
-            <ul>
-            {% if form.email.errors %}
-                {% for error in form.email.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            {% endif %}
-            </ul>
+        <div class="form-inline">
+        <div class="form-group">
+            {{ form.email.label(for="email", class="sr-only") }}
+            {{ form.email(class="form-control", placeholder="Email") }}
+            {{ form.password.label(for="password", class="sr-only") }}
+            {{ form.password(class="form-control", placeholder="Password") }}
         </div>
-        <div>
-            {{ form.password.label }} {{ form.password() }}
-            <ul>
-            {% if form.password.errors %}
-                {% for error in form.password.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            {% endif %}
-            </ul>
+        {{ form.submit(class="btn btn-primary") }}
         </div>
-        {{ form.submit() }}
     </form>
 </div>
 {% endblock %}
