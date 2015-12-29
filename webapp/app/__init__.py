@@ -31,6 +31,15 @@ def create_app(config=None):
     from main.views import main as main_blueprint
     app.register_blueprint(main_blueprint, url_prefix='')
 
+    from customers.views import customers as customers_blueprint
+    app.register_blueprint(customers_blueprint, url_prefix='/customers')
+
+    from relations.views import relations as relations_blueprint
+    app.register_blueprint(relations_blueprint, url_prefix='/relations')
+
+    from webboard.views import webboard as webboard_blueprint
+    app.register_blueprint(webboard_blueprint, url_prefix='/webboard')
+
     db.init_app(app)
     flask_bcrypt.init_app(app)
     login_manager.init_app(app)
@@ -38,7 +47,7 @@ def create_app(config=None):
 
     return app
 
-from app.auth.models import User
+from app.models import User
 
 @login_manager.user_loader
 def load_user(user_id):
