@@ -8,16 +8,20 @@ class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer(), primary_key=True)
     email = db.Column(db.String(255), unique=True)
-    created_on = db.Column(db.DateTime(), default=datetime.datetime.utcnow())
-    username = db.Column(db.String(40), unique=True)
+    created_on = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
+    firstname = db.Column(db.String(128), unique=True)
+    lastname = db.Column(db.String(128), unique=True)
     _password = db.Column('password', db.String(60))
-    labinfo_id = db.Column(db.Integer, db.ForeignKey('labinfo.id'))
+    affiliation_id = db.Column(db.Integer, db.ForeignKey('affiliations.id'))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
 
-    def __init__(self, email, username, password):
+    def __init__(self, email, firstname, lastname,
+                    password, role):
         self.email = email
         self.password = password
-        self.username = username
+        self.firstname = firstname
+        self.lastname = lastname
+        self.role = role
         self.labinfo = None
 
     def __repr__(self):
@@ -59,16 +63,60 @@ class AnonymousUser(AnonymousUserMixin):
         return False
 
 
-class LabInfo(db.Model):
-    __tablename__ = 'labinfo'
+class OrgType(db.Model):
+    __tablename__ = 'org_types'
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(40))
+    affiliations = db.relationship('Affiliation',
+            backref='org_type', lazy='dynamic')
+
+    @staticmethod
+    def insert_types():
+        types = {
+                'hospital',
+                'private',
+                'government',
+                'academic',
+                'other'
+                }
+
+        for t in types:
+            if not OrgType.query.filter_by(name=t).first():
+                ot = OrgType(name=t)
+                db.session.add(ot)
+
+        db.session.commit()
+
+
+class OrgPwd(db.Model):
+    __tablename__ = 'orgpwds'
+    id = db.Column(db.Integer, primary_key=True)
+    expiration_date = db.Column(db.DateTime())
+    created_date = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
+    affiliations = db.relationship('Affiliation', backref='orgpwd',
+            lazy='dynamic')
+
+    @hybrid_property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, password):
+        self._password = flask_bcrypt.generate_password_hash(password)
+
+
+class Affiliation(db.Model):
+    __tablename__ = 'affiliations'
+    id = db.Column(db.Integer, primary_key=True)
+    org_type_id = db.Column(db.Integer, db.ForeignKey('org_types.id'))
     org = db.Column(db.String(255))
     labname = db.Column(db.String(255))
     province = db.Column(db.String(255))
     district = db.Column(db.String(255))
     address = db.Column(db.Text())
-    customers = db.relationship('User', backref='labinfo')
-    added_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
+    users = db.relationship('User', backref='affiliation')
+    added_on = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
+    password_id = db.Column(db.Integer, db.ForeignKey('orgpwds'))
 
     def __init__(self, org, province, district,
                         labname=None, address=None):
