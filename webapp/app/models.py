@@ -53,6 +53,9 @@ class User(db.Model):
         return self.role is not None and \
                 (self.role.permissions & permissions) == permissions
 
+    def correct_user_type(self, utype):
+        return self.user_type is not None and (self.user_type) == utype
+
     def is_administrator(self):
         return self.can(Permission.ADMINISTER)
 
