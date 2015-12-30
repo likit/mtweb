@@ -1,3 +1,4 @@
+#! -*- coding: utf-8 -*-
 import datetime
 from app import db, flask_bcrypt
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -67,22 +68,25 @@ class OrgType(db.Model):
     __tablename__ = 'org_types'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40))
+    th_name = db.Column(db.String(255))
     affiliations = db.relationship('Affiliation',
             backref='org_type', lazy='dynamic')
 
     @staticmethod
     def insert_types():
         types = {
-                'hospital',
-                'private',
-                'government',
-                'academic',
-                'other'
+                'hospital': u'โรงพยาบาล',
+                'private': u'เอกชน',
+                'government': u'รัณบาล',
+                'academic': u'สถาบัรการศึกษา',
+                'personal': u'ส่วนตัว',
+                'research': u'งานวิจัย',
+                'other': 'อื่นๆ',
                 }
 
-        for t in types:
+        for t,th_name in types.iteritems():
             if not OrgType.query.filter_by(name=t).first():
-                ot = OrgType(name=t)
+                ot = OrgType(name=t, th_name=th_name)
                 db.session.add(ot)
 
         db.session.commit()
@@ -105,6 +109,13 @@ class OrgPwd(db.Model):
         self._password = flask_bcrypt.generate_password_hash(password)
 
 
+class Service(db.Model):
+    __tablename__ = 'services'
+    id = db.Column(db.Integer, primaray_key=True)
+    name = db.Column(db.String(255))
+    affiliations = db.relationship('Affiliation', backref='service')
+
+
 class Affiliation(db.Model):
     __tablename__ = 'affiliations'
     id = db.Column(db.Integer, primary_key=True)
@@ -117,6 +128,8 @@ class Affiliation(db.Model):
     users = db.relationship('User', backref='affiliation')
     added_on = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
     password_id = db.Column(db.Integer, db.ForeignKey('orgpwds'))
+    service_id = db.Column(db.Integer, db.ForeignKey('services.id'),
+            lazy='dynamic')
 
     def __init__(self, org, province, district,
                         labname=None, address=None):
