@@ -14,6 +14,7 @@ class User(db.Model):
     lastname = db.Column(db.String(128), unique=True)
     _password = db.Column('password', db.String(60))
     affiliation_id = db.Column(db.Integer, db.ForeignKey('affiliations.id'))
+    user_type = db.Column(db.Integer)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
 
     def __init__(self, email, firstname, lastname,
@@ -146,6 +147,14 @@ class Permission:
     WRITE_ARTICLES = 0x04
     MODERATE_COMMENTS = 0x08
     ADMINISTER = 0x80
+
+
+class UserType:
+    STUDENT = 0x01
+    STAFF = 0x02
+    TEACHER = 0x04
+    CUSTOMER = 0x08
+
 
 class Role(db.Model):
     __tablename__ = 'roles'
