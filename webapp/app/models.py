@@ -18,13 +18,13 @@ class User(db.Model):
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
 
     def __init__(self, email, firstname, lastname,
-                    password, role):
+                    password, role, user_type):
         self.email = email
         self.password = password
         self.firstname = firstname
         self.lastname = lastname
         self.role = role
-        self.labinfo = None
+        self.user_type = user_type
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -76,18 +76,18 @@ class OrgType(db.Model):
     @staticmethod
     def insert_types():
         types = {
-                'hospital': u'โรงพยาบาล',
-                'private': u'เอกชน',
-                'government': u'รัณบาล',
-                'academic': u'สถาบัรการศึกษา',
-                'personal': u'ส่วนตัว',
-                'research': u'งานวิจัย',
+                'hospital': 'โรงพยาบาล',
+                'private': 'เอกชน',
+                'government': 'รัณบาล',
+                'academic': 'สถาบัรการศึกษา',
+                'personal': 'ส่วนตัว',
+                'research': 'งานวิจัย',
                 'other': 'อื่นๆ',
                 }
 
         for t,th_name in types.iteritems():
             if not OrgType.query.filter_by(name=t).first():
-                ot = OrgType(name=t, th_name=th_name)
+                ot = OrgType(name=t, th_name=unicode(th_name, 'utf8'))
                 db.session.add(ot)
 
         db.session.commit()
@@ -112,9 +112,10 @@ class OrgPwd(db.Model):
 
 class Service(db.Model):
     __tablename__ = 'services'
-    id = db.Column(db.Integer, primaray_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
-    affiliations = db.relationship('Affiliation', backref='service')
+    affiliations = db.relationship('Affiliation', backref='service',
+            lazy='dynamic')
 
 
 class Affiliation(db.Model):
@@ -126,11 +127,10 @@ class Affiliation(db.Model):
     province = db.Column(db.String(255))
     district = db.Column(db.String(255))
     address = db.Column(db.Text())
-    users = db.relationship('User', backref='affiliation')
+    users = db.relationship('User', backref='affiliation', lazy='dynamic')
     added_on = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
-    password_id = db.Column(db.Integer, db.ForeignKey('orgpwds'))
-    service_id = db.Column(db.Integer, db.ForeignKey('services.id'),
-            lazy='dynamic')
+    password_id = db.Column(db.Integer, db.ForeignKey('orgpwds.id'))
+    service_id = db.Column(db.Integer, db.ForeignKey('services.id'))
 
     def __init__(self, org, province, district,
                         labname=None, address=None):
