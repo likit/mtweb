@@ -5,6 +5,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from flask.ext.login import UserMixin, AnonymousUserMixin
 
 
+# use UserMixin?
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer(), primary_key=True)
@@ -59,7 +60,7 @@ class User(db.Model):
     def is_administrator(self):
         return self.can(Permission.ADMINISTER)
 
-#TODO: Add AnonymousUserMixin class
+
 class AnonymousUser(AnonymousUserMixin):
     def can(self, permissions):
         return False
@@ -185,6 +186,7 @@ class Role(db.Model):
 
         for r in roles:
             role = Role.query.filter_by(name=r).first()
+            # a new role created for the role not in the database
             if role is None:
                 role = Role(name=r)
             role.permissions = roles[r][0]
