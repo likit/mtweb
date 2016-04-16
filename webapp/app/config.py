@@ -3,6 +3,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
+    # replace this with a truly random key
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'thegodfather'
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 
