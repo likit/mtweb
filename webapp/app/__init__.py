@@ -3,21 +3,20 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.bcrypt import Bcrypt
 from flask.ext.login import LoginManager
 from flask.ext.bootstrap import Bootstrap
+from config import config
 
 db = SQLAlchemy()
 flask_bcrypt = Bcrypt()
 login_manager = LoginManager()
+login_manager.session_protection = 'strong'
+login_manager.login_view = 'auth.login'
+
 bootstrap = Bootstrap()
 
-def create_app(config=None):
+def create_app(config_name):
     app = Flask(__name__)
-
-    # configure the app here
-    if config:
-        pass
-    else:
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../mtweb.db'
-        app.config['SECRET_KEY'] = 'thegodfather'
+    app.config.from_object(config[config_name])
+    config[config_name].init_app(app)
 
     from services.views import services as services_blueprint
     app.register_blueprint(services_blueprint, url_prefix='/services')

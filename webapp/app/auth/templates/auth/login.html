@@ -14,6 +14,7 @@
             {{ form.password(class="form-control", placeholder="Password") }}
         </div>
         {{ form.submit(class="btn btn-primary") }}
+        <p>New user? <a href={{ url_for('auth.register') }}>Click here</a> to register.</p>
         </div>
     </form>
 </div>
