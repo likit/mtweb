@@ -17,6 +17,9 @@ class User(db.Model):
     affiliation_id = db.Column(db.Integer, db.ForeignKey('affiliations.id'))
     user_type = db.Column(db.Integer)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    about_me = db.Column(db.Text())
+    last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
+    location = db.Column(db.String(64))
 
     def __init__(self, email, firstname, lastname,
                     password, role, user_type):
@@ -59,6 +62,10 @@ class User(db.Model):
 
     def is_administrator(self):
         return self.can(Permission.ADMINISTER)
+
+    def ping(self):
+        self.last_seen = datetime.utcnow()
+        db.session.add(self)
 
 
 class AnonymousUser(AnonymousUserMixin):

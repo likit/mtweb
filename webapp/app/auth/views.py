@@ -6,6 +6,13 @@ from flask.ext.login import login_user, logout_user
 
 auth = Blueprint('auth', __name__, template_folder='templates')
 
+@auth.before_app_request
+def before_request():
+    if current_user.is_authenticated():
+        current_user.ping()
+        # add code that checks whether the user is confirmed
+
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -33,11 +40,12 @@ def register():
             flash('Email has already been used.')
             return render_template('auth/register.html', form=form)
         else:
+            # assign default role to all new users
             role = Role.query.filter_by(default=True).first()
             if (form.email.data.endswith('mahidol.edu') or
                     form.email.data.endswith('mahidol.ac.th')):
-                # check the student database
-                # check the staff database
+                # check the student database to see if the email exists
+                # check the staff database to see if the email exists
                 user_type = UserType.STUDENT
             else:
                 user_type = UserType.CUSTOMER
