@@ -3,10 +3,12 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.bcrypt import Bcrypt
 from flask.ext.login import LoginManager
 from flask.ext.bootstrap import Bootstrap
+from flask.ext.moment import Moment
 from config import config
 
 db = SQLAlchemy()
 flask_bcrypt = Bcrypt()
+moment = Moment()
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
@@ -43,6 +45,7 @@ def create_app(config_name):
     flask_bcrypt.init_app(app)
     login_manager.init_app(app)
     bootstrap.init_app(app)
+    moment.init_app(app)
 
     return app
 
