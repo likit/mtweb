@@ -225,6 +225,7 @@ class FacultyInfo(db.Model):
 
 
 class Department(db.Model):
+    __tablename__ = 'departments'
     id = db.Column(db.Integer(), primary_key=True)
     th_name = db.Column(db.String(128))
     en_name = db.Column(db.String(128))
