@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template
-from app.models import Permission
+from app.models import Permission, User
 
 main = Blueprint('main', __name__, template_folder='templates')
 
@@ -13,9 +13,9 @@ def index():
 def inject_permission():
     return dict(Permission=Permission)
 
-@main.route('/user/<username>')
-def user(username):
-    user = User.query.filter_by(username=username).first()
+@main.route('/user/<email>')
+def user(email):
+    user = User.query.filter_by(email=email).first()
     if user is None:
         abort(404)
-    return render_template('user.html', user=user)
+    return render_template('main/user.html', user=user)
