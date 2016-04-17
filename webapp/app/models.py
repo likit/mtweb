@@ -202,3 +202,42 @@ class Role(db.Model):
             db.session.add(role)
         db.session.commit()
 
+
+class AcademicPosition:
+    lecturer = 0x01
+    assistant = 0x02
+    associate = 0x04
+    professor = 0x08
+
+
+class FacultyInfo(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    office_room = db.Column(db.String(8))
+    office_phone = db.Column(db.String(8))
+    mobile_phone = db.Column(db.String(16))
+    car_license_plate = db.Column(db.String(8))
+    academic_position = db.Column(db.Integer())
+    department = db.Column(db.Integer(), db.ForeignKey('departments.id'))
+    department_head = db.Column(db.Boolean(), default=False)
+
+    def __repr__(self):
+        return '<Faculty Info %d>' % id
+
+
+class Department(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    th_name = db.Column(db.String(128))
+    en_name = db.Column(db.String(128))
+    staff = db.relationship('User', backref='department',
+                                                lazy='dynamic')
+    def __repr__(self):
+        return '<Department %s>' % self.en_name
+
+
+class StudentInfo(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    studentid = db.Column(db.String(64), unique=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+
+    def __repr__(self):
+        return '<Student ID %s>' % self.studentid
