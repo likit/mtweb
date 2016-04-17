@@ -1,5 +1,5 @@
 #! -*- coding: utf-8 -*-
-import datetime
+from datetime import datetime
 from app import db, flask_bcrypt
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask.ext.login import UserMixin, AnonymousUserMixin
@@ -9,8 +9,9 @@ from flask.ext.login import UserMixin, AnonymousUserMixin
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer(), primary_key=True)
+    username = db.Column(db.String(255))
     email = db.Column(db.String(255), unique=True)
-    created_on = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
+    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
     firstname = db.Column(db.String(128), unique=True)
     lastname = db.Column(db.String(128), unique=True)
     _password = db.Column('password', db.String(60))
@@ -108,7 +109,7 @@ class OrgPwd(db.Model):
     __tablename__ = 'orgpwds'
     id = db.Column(db.Integer, primary_key=True)
     expiration_date = db.Column(db.DateTime())
-    created_date = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
+    created_date = db.Column(db.DateTime(), default=datetime.utcnow)
     affiliations = db.relationship('Affiliation', backref='orgpwd',
             lazy='dynamic')
 
@@ -139,7 +140,7 @@ class Affiliation(db.Model):
     district = db.Column(db.String(255))
     address = db.Column(db.Text())
     users = db.relationship('User', backref='affiliation', lazy='dynamic')
-    added_on = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
+    added_on = db.Column(db.DateTime(), default=datetime.utcnow)
     password_id = db.Column(db.Integer, db.ForeignKey('orgpwds.id'))
     service_id = db.Column(db.Integer, db.ForeignKey('services.id'))
 
