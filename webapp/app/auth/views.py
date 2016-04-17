@@ -2,13 +2,13 @@ from flask import (Blueprint, render_template, redirect, url_for, flash)
 from app import flask_bcrypt, db
 from .forms import LoginForm, RegisterForm
 from app.models import User, Role, UserType
-from flask.ext.login import login_user, logout_user
+from flask.ext.login import login_user, logout_user, current_user
 
 auth = Blueprint('auth', __name__, template_folder='templates')
 
 @auth.before_app_request
 def before_request():
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
         current_user.ping()
         # add code that checks whether the user is confirmed
 
