@@ -6,12 +6,15 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename="jquery-1.11.3.min.js") }}"></script>
-<script src="{{ url_for('static', filename="bootstrap.js") }}"></script>
+{{ super() }}
+{# <script src="{{ url_for('static', filename="jquery-1.11.3.min.js") }}"></script> #}
+{# <script src="{{ url_for('static', filename="bootstrap.js") }}"></script> #}
+{{ moment.include_moment() }}
 {% endblock %}
 
 {% block styles %}
-<link rel=stylesheet href="{{ url_for('static', filename="bootstrap.css") }}">
+{{ super() }}
+{# <link rel=stylesheet href="{{ url_for('static', filename="bootstrap.css") }}"> #}
 {% endblock %}
 
 {% block title %}MUMT Website{% endblock %}
@@ -145,6 +148,8 @@
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user.is_authenticated %}
                 <li><a href="{{ url_for('auth.logout') }}">Sign Out</a></li>
+                <li><a href="{{ url_for('main.user',
+                        email=current_user.email) }}">Profile</a></li>
                 {% else %}
                 <li><a href="{{ url_for('auth.login') }}">Sign In</a></li>
                 {% endif %}
