@@ -1,19 +1,53 @@
-from flask import Flask
+from flask import Flask, g, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.bcrypt import Bcrypt
-from flask.ext.login import LoginManager
+from flask.ext.login import LoginManager, current_user
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.moment import Moment
+from flask.ext.admin import Admin
+from flask.ext.admin.contrib.sqla import ModelView
 from config import config
+# from models import Department, User, Role
 
 db = SQLAlchemy()
 flask_bcrypt = Bcrypt()
 moment = Moment()
+admin = Admin()
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
 
 bootstrap = Bootstrap()
+
+
+class AdminAuthentication(object):
+    def is_accessible(self):
+        return current_user.is_authenticated \
+                and current_user.is_administrator()
+
+
+class BaseModelView(AdminAuthentication, ModelView):
+    pass
+
+
+class UserModelView(AdminAuthentication, ModelView):
+    _user_type_choices = [(choice, label) for choice, label in [
+        (0x01, 'Student'),
+        (0x02, 'Staff'),
+        (0x04, 'Teacher'),
+        (0x08, 'Customer'),
+        ]]
+    column_choices = {
+            'user_type': _user_type_choices
+            }
+    column_list = ['username', 'role_id',
+                    'user_type', 'created_on',
+                    'firstname', 'lastname',
+                    'email']
+    column_searchable_list = ['firstname', 'lastname', 'email', 'user_type']
+
+    # column_select_related_list = ['email']
+
 
 def create_app(config_name):
     app = Flask(__name__)
@@ -46,6 +80,12 @@ def create_app(config_name):
     login_manager.init_app(app)
     bootstrap.init_app(app)
     moment.init_app(app)
+    admin.init_app(app)
+
+    from models import User, Department, Role
+    admin.add_view(UserModelView(User, db.session))
+    admin.add_view(BaseModelView(Department, db.session))
+    admin.add_view(BaseModelView(Role, db.session))
 
     return app
 
