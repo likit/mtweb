@@ -9,11 +9,15 @@ from flask.ext.login import UserMixin, AnonymousUserMixin
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer(), primary_key=True)
+    title = db.Column(db.Integer(), db.ForeignKey('titles.id'))
+    gender = db.Column(db.Integer()) # 0 for male and 1 for female
     username = db.Column(db.String(255))
     email = db.Column(db.String(255), unique=True)
     created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    firstname = db.Column(db.String(128), unique=True)
-    lastname = db.Column(db.String(128), unique=True)
+    th_firstname = db.Column(db.String(128), unique=True)
+    th_lastname = db.Column(db.String(128), unique=True)
+    en_firstname = db.Column(db.String(128), unique=True)
+    en_lastname = db.Column(db.String(128), unique=True)
     _password = db.Column('password', db.String(60))
     affiliation_id = db.Column(db.Integer, db.ForeignKey('affiliations.id'))
     user_type = db.Column(db.Integer)
@@ -21,15 +25,20 @@ class User(db.Model):
     about_me = db.Column(db.Text())
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     location = db.Column(db.String(64))
+    faculty_id = db.Column(db.Integer, db.ForeignKey('facultyinfo.id'))
+    student_id = db.Column(db.Integer, db.ForeignKey('studentinfo.id'))
 
-    def __init__(self, email, firstname, lastname,
-                    password, role, user_type):
+    def __init__(self, email, th_firstname, th_lastname,
+                    en_firstname, en_lastname,
+                    password, role):
         self.email = email
         self.password = password
-        self.firstname = firstname
-        self.lastname = lastname
+        self.th_firstname = th_firstname
+        self.th_lastname = th_lastname
+        self.en_firstname = en_firstname
+        self.en_lastname = en_lastname
         self.role = role
-        self.user_type = user_type
+        # self.user_type = user_type
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -203,21 +212,29 @@ class Role(db.Model):
         db.session.commit()
 
 
-class AcademicPosition:
-    lecturer = 0x01
-    assistant = 0x02
-    associate = 0x04
-    professor = 0x08
+class AcademicPosition(db.Model):
+    __tablename__ = 'academic_positions'
+    id = db.Column(db.Integer(), primary_key=True)
+    en_title = db.Column(db.String(64))
+    en_title_abv = db.Column(db.String(64))
+    th_title = db.Column(db.String(64))
+    th_title_abv = db.Column(db.String(64))
+    ranking = db.Column(db.Integer())
+
+    def __repr__(self):
+        return '<Academic Position %s>' % en_title
 
 
 class FacultyInfo(db.Model):
+    __tablename__ = 'facultyinfo'
     id = db.Column(db.Integer(), primary_key=True)
     office_room = db.Column(db.String(8))
     office_phone = db.Column(db.String(8))
     mobile_phone = db.Column(db.String(16))
     car_license_plate = db.Column(db.String(8))
-    academic_position = db.Column(db.Integer())
-    department = db.Column(db.Integer(), db.ForeignKey('departments.id'))
+    academic_position = db.Column(db.Integer(), db.ForeignKey('academic_positions.id'))
+    department_id = db.Column(db.Integer(), db.ForeignKey('departments.id'))
+    fid = db.Column(db.Integer(), db.ForeignKey('users.id'))
     department_head = db.Column(db.Boolean(), default=False)
 
     def __repr__(self):
@@ -229,16 +246,28 @@ class Department(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     th_name = db.Column(db.String(128))
     en_name = db.Column(db.String(128))
-    staff = db.relationship('User', backref='department',
+    staff = db.relationship('FacultyInfo', backref='department',
                                                 lazy='dynamic')
+
     def __repr__(self):
         return '<Department %s>' % self.en_name
 
 
+class Title(db.Model):
+    __tablename__ = 'titles'
+    id = db.Column(db.Integer(), primary_key=True)
+    th_name = db.Column(db.String(64))
+    en_name = db.Column(db.String(64))
+
+    def __repr__(self):
+        return '<Title %s>' % self.en_name
+
+
 class StudentInfo(db.Model):
+    __tablename__ = 'studentinfo'
     id = db.Column(db.Integer(), primary_key=True)
     studentid = db.Column(db.String(64), unique=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    sid = db.Column(db.Integer(), db.ForeignKey('users.id'))
 
     def __repr__(self):
         return '<Student ID %s>' % self.studentid

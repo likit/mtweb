@@ -12,8 +12,10 @@ class LoginForm(Form):
     submit = SubmitField('Login')
 
 class RegisterForm(Form):
-    firstname = StringField('Name', validators=[DataRequired()])
-    lastname = StringField('Lastname', validators=[DataRequired()])
+    th_firstname = StringField('Thai firstname', validators=[DataRequired()])
+    th_lastname = StringField('Thai surname', validators=[DataRequired()])
+    en_firstname = StringField('English firstname', validators=[DataRequired()])
+    en_lastname = StringField('English surname', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password',
             validators=[EqualTo('password2'), DataRequired()])

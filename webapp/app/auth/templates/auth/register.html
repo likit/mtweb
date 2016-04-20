@@ -4,15 +4,21 @@
 <div class="container">
     <div class="row">
         <h2>Please fill out the form to register.</h2>
-        <div class="form-horizontal col-md-4">
+        <div class="form-horizontal col-md-4" method="POST" action="{{ url_for('auth.register') }}">
                 <form action="{{ url_for('auth.register')}}" method="post">
                     {{ form.hidden_tag() }}
                     {{ form.id }}
                     <div class="form-group">
-                        {{ form.firstname.label(for="firstname") }} {{ form.firstname(class="form-control") }}
+                        {{ form.th_firstname.label(for="th_firstname") }} {{ form.th_firstname(class="form-control") }}
                     </div>
                     <div class="form-group">
-                        {{ form.lastname.label(for="lastname") }} {{ form.lastname(class="form-control") }}
+                        {{ form.th_lastname.label(for="th_lastname") }} {{ form.th_lastname(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.en_firstname.label(for="en_firstname") }} {{ form.en_firstname(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.en_lastname.label(for="en_lastname") }} {{ form.en_lastname(class="form-control") }}
                     </div>
                     <div class="form-group">
                         {{ form.email.label(for="email") }} {{ form.email(class="form-control") }}

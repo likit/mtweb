@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 from flask import (Blueprint, render_template, redirect, url_for, flash)
 from app import flask_bcrypt, db
 from .forms import LoginForm, RegisterForm
@@ -22,7 +23,7 @@ def login():
                 form.password.data):
             login_user(user)
             flash('Welcome %s %s. You have logged in successfully.'
-                    % (user.firstname, user.lastname))
+                    % (user.en_firstname, user.en_lastname))
             return redirect(url_for('main.index'))
         else:
             flash('User not found.')
@@ -46,15 +47,21 @@ def register():
                     form.email.data.endswith('mahidol.ac.th')):
                 # check the student database to see if the email exists
                 # check the staff database to see if the email exists
-                user_type = UserType.STUDENT
+                #TODO: user_type = UserType.STUDENT
+                pass
             else:
-                user_type = UserType.CUSTOMER
+                #TODO: user_type = UserType.CUSTOMER
+                pass
 
-            user = User(firstname=form.firstname.data,
-                    lastname=form.lastname.data,
+            user = User(th_firstname=form.th_firstname.data,
+                    th_lastname=form.th_lastname.data,
+                    en_firstname=form.en_firstname.data,
+                    en_lastname=form.en_lastname.data,
                     email=form.email.data,
                     password=form.password.data,
-                    role=role, user_type=user_type)
+                    role=role,
+                    # user_type=user_type,
+                    )
 
             db.session.add(user)
             db.session.commit()
