@@ -9,7 +9,18 @@ from flask.ext.login import UserMixin, AnonymousUserMixin
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer(), primary_key=True)
-    title = db.Column(db.Integer(), db.ForeignKey('titles.id'))
+    faculty_id = db.Column(db.Integer, db.ForeignKey('facultyinfo.id'))
+    student_id = db.Column(db.Integer, db.ForeignKey('studentinfo.id'))
+    affiliation_id = db.Column(db.Integer, db.ForeignKey('affiliations.id'))
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    title_id = db.Column(db.Integer(), db.ForeignKey('titles.id'))
+    department_id = db.Column(db.Integer(),
+                        db.ForeignKey('departments.id'))
+    job_id = db.Column(db.Integer(), db.ForeignKey('jobs.id'))
+
+
+    title = db.relationship('Title', backref='users',
+                                foreign_keys='User.title_id')
     gender = db.Column(db.Integer()) # 0 for male and 1 for female
     username = db.Column(db.String(255))
     email = db.Column(db.String(255), unique=True)
@@ -19,14 +30,17 @@ class User(db.Model):
     en_firstname = db.Column(db.String(128), unique=True)
     en_lastname = db.Column(db.String(128), unique=True)
     _password = db.Column('password', db.String(60))
-    affiliation_id = db.Column(db.Integer, db.ForeignKey('affiliations.id'))
     user_type = db.Column(db.Integer)
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     about_me = db.Column(db.Text())
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
-    location = db.Column(db.String(64))
-    faculty_id = db.Column(db.Integer, db.ForeignKey('facultyinfo.id'))
-    student_id = db.Column(db.Integer, db.ForeignKey('studentinfo.id'))
+    # location = db.Column(db.String(64))
+    department = db.relationship('Department', backref='members',
+                                foreign_keys='User.department_id')
+    job = db.relationship('Job', backref='users',
+                            foreign_keys='User.job_id')
+
+    # one-to-one relationship with FacultyInfo
+    faculty_info = db.relationship('FacultyInfo', uselist=False)
 
     def __init__(self, email, th_firstname, th_lastname,
                     en_firstname, en_lastname,
@@ -92,7 +106,7 @@ class OrgType(db.Model):
     name = db.Column(db.String(40))
     th_name = db.Column(db.String(255))
     affiliations = db.relationship('Affiliation',
-            backref='org_type', lazy='dynamic')
+                        backref='org_type', lazy='dynamic')
 
     @staticmethod
     def insert_types():
@@ -228,13 +242,14 @@ class AcademicPosition(db.Model):
 class FacultyInfo(db.Model):
     __tablename__ = 'facultyinfo'
     id = db.Column(db.Integer(), primary_key=True)
-    office_room = db.Column(db.String(8))
-    office_phone = db.Column(db.String(8))
+    office_id = db.Column(db.Integer(), db.ForeignKey('rooms.id'))
+    academic_position_id = db.Column(db.Integer(),
+                            db.ForeignKey('academic_positions.id'))
+    office = db.relationship('RoomDirectory', backref='residences',
+                                    foreign_keys='FacultyInfo.office_id')
     mobile_phone = db.Column(db.String(16))
     car_license_plate = db.Column(db.String(8))
-    academic_position = db.Column(db.Integer(), db.ForeignKey('academic_positions.id'))
-    department_id = db.Column(db.Integer(), db.ForeignKey('departments.id'))
-    fid = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    # fid = db.Column(db.Integer(), db.ForeignKey('users.id'))
     department_head = db.Column(db.Boolean(), default=False)
 
     def __repr__(self):
@@ -246,8 +261,8 @@ class Department(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     th_name = db.Column(db.String(128))
     en_name = db.Column(db.String(128))
-    staff = db.relationship('FacultyInfo', backref='department',
-                                                lazy='dynamic')
+    facultyinfo_id = db.Column(db.Integer(),
+                        db.ForeignKey('facultyinfo.id'))
 
     def __repr__(self):
         return '<Department %s>' % self.en_name
@@ -256,11 +271,43 @@ class Department(db.Model):
 class Title(db.Model):
     __tablename__ = 'titles'
     id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
     th_name = db.Column(db.String(64))
     en_name = db.Column(db.String(64))
 
     def __repr__(self):
         return '<Title %s>' % self.en_name
+
+
+class Job(db.Model):
+    __tablename__ = 'jobs'
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    th_name = db.Column(db.String(64))
+    en_name = db.Column(db.String(64))
+
+    def __repr__(self):
+        return '<Job %s>' % self.en_name
+
+
+class Building(db.Model):
+    __tablename__ = 'buildings'
+    id = db.Column(db.Integer(), primary_key=True)
+    th_name = db.Column(db.String(255))
+    th_location = db.Column(db.String(255))
+    en_name = db.Column(db.String(255))
+    en_location = db.Column(db.String(255))
+
+
+class RoomDirectory(db.Model):
+    __tablename__ = 'rooms'
+    id = db.Column(db.Integer(), primary_key=True)
+    residence_id = db.Column(db.Integer(), db.ForeignKey('facultyinfo.id'))
+    building_id = db.Column(db.Integer(), db.ForeignKey('buildings.id'))
+    roomid = db.Column(db.String(8))
+    building = db.relationship('Building', backref='rooms',
+                                foreign_keys='RoomDirectory.building_id')
+    phone = db.Column(db.String(24))
 
 
 class StudentInfo(db.Model):
