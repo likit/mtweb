@@ -2,7 +2,7 @@
 from flask import (Blueprint, render_template, redirect, url_for, flash)
 from app import flask_bcrypt, db
 from .forms import LoginForm, RegisterForm
-from app.models import User, Role, UserType
+from app.models import User, SystemRole, ForumRole, UserType
 from flask.ext.login import login_user, logout_user, current_user
 
 auth = Blueprint('auth', __name__, template_folder='templates')
@@ -42,7 +42,8 @@ def register():
             return render_template('auth/register.html', form=form)
         else:
             # assign default role to all new users
-            role = Role.query.filter_by(default=True).first()
+            systemrole = SystemRole.query.filter_by(default=True).first()
+            forumrole = ForumRole.query.filter_by(default=True).first()
             if (form.email.data.endswith('mahidol.edu') or
                     form.email.data.endswith('mahidol.ac.th')):
                 # check the student database to see if the email exists
@@ -59,7 +60,8 @@ def register():
                     en_lastname=form.en_lastname.data,
                     email=form.email.data,
                     password=form.password.data,
-                    role=role,
+                    systemrole=role,
+                    forumrole=role,
                     # user_type=user_type,
                     )
 

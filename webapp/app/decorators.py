@@ -1,7 +1,7 @@
 from functools import wraps
 from flask import abort
 from flask.ext.login import current_user
-from app.models import Permission, UserType
+from app.models import ForumPermission, UserType
 
 
 def permission_required(permission):
@@ -16,7 +16,7 @@ def permission_required(permission):
 
 
 def admin_required(f):
-    return permission_required(Permission.ADMINISTER)(f)
+    return permission_required(ForumPermission.ADMINISTER)(f)
 
 
 def correct_user_type_required(utype):
