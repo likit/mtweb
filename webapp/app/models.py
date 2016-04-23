@@ -12,7 +12,8 @@ class User(db.Model):
     # faculty_id = db.Column(db.Integer, db.ForeignKey('facultyinfo.id'))
     student_id = db.Column(db.Integer, db.ForeignKey('studentinfo.id'))
     affiliation_id = db.Column(db.Integer, db.ForeignKey('affiliations.id'))
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    systemrole_id = db.Column(db.Integer, db.ForeignKey('systemroles.id'))
+    forumrole_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     title_id = db.Column(db.Integer(), db.ForeignKey('titles.id'))
     department_id = db.Column(db.Integer(),
                         db.ForeignKey('departments.id'))
@@ -182,11 +183,19 @@ class Affiliation(db.Model):
         self.address = address
 
 
-class Permission:
+class ForumPermission:
     FOLLOW = 0x01
     COMMENT = 0x02
     WRITE_ARTICLES = 0x04
     MODERATE_COMMENTS = 0x08
+    ADMINISTER = 0x80
+
+
+class SystemPermission:
+    VIEW = 0x01
+    COMMENT = 0x02
+    # WRITE_ARTICLES = 0x04
+    # MODERATE_COMMENTS = 0x08
     ADMINISTER = 0x80
 
 
@@ -197,13 +206,46 @@ class UserType:
     CUSTOMER = 0x08
 
 
-class Role(db.Model):
-    __tablename__ = 'roles'
+class SystemRole(db.Model):
+    __tablename__ = 'systemroles'
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
     name = db.Column(db.String(64), unique=True)
     default = db.Column(db.Boolean, default=False, index=True)
     permissions = db.Column(db.Integer)
-    users = db.relationship('User', backref='role', lazy='dynamic')
+    users = db.relationship('User', backref='systemrole',
+                                foreign_keys='SystemRole.user_id')
+
+    def __repr__(self):
+        return '<SystemRole %s>' % self.name
+
+    @staticmethod
+    def insert_roles():
+        roles = {
+                'User': (SystemPermission.VIEW, True),
+                'Administrator': (0xff, False)
+                }
+
+        for r in roles:
+            role = SystemRole.query.filter_by(name=r).first()
+            # a new role created for the role not in the database
+            if role is None:
+                role = SystemRole(name=r)
+            role.permissions = roles[r][0]
+            role.default = roles[r][1]
+            db.session.add(role)
+        db.session.commit()
+
+
+class ForumRole(db.Model):
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    name = db.Column(db.String(64), unique=True)
+    default = db.Column(db.Boolean, default=False, index=True)
+    permissions = db.Column(db.Integer)
+    users = db.relationship('User', backref='forumrole',
+                                foreign_keys='ForumRole.user_id')
 
     def __repr__(self):
         return '<Role %s>' % self.name
@@ -211,21 +253,21 @@ class Role(db.Model):
     @staticmethod
     def insert_roles():
         roles = {
-                'User': (Permission.FOLLOW |
-                    Permission.COMMENT |
-                    Permission.WRITE_ARTICLES, True),
-                'Moderator': (Permission.COMMENT |
-                    Permission.FOLLOW |
-                    Permission.WRITE_ARTICLES |
-                    Permission.MODERATE_COMMENTS, False),
+                'User': (ForumPermission.FOLLOW |
+                    ForumPermission.COMMENT |
+                    ForumPermission.WRITE_ARTICLES, True),
+                'Moderator': (ForumPermission.COMMENT |
+                    ForumPermission.FOLLOW |
+                    ForumPermission.WRITE_ARTICLES |
+                    ForumPermission.MODERATE_COMMENTS, False),
                 'Administrator': (0xff, False)
                 }
 
         for r in roles:
-            role = Role.query.filter_by(name=r).first()
+            role = ForumRole.query.filter_by(name=r).first()
             # a new role created for the role not in the database
             if role is None:
-                role = Role(name=r)
+                role = ForumRole(name=r)
             role.permissions = roles[r][0]
             role.default = roles[r][1]
             db.session.add(role)
