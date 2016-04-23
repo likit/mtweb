@@ -21,6 +21,8 @@ class User(db.Model):
 
     title = db.relationship('Title', backref='users',
                                 foreign_keys='User.title_id')
+    contact = db.relationship('Contact', uselist=False, backref='user')
+
     gender = db.Column(db.Integer()) # 0 for male and 1 for female
     username = db.Column(db.String(255))
     email = db.Column(db.String(255), unique=True)
@@ -229,31 +231,68 @@ class Role(db.Model):
 class AcademicPosition(db.Model):
     __tablename__ = 'academic_positions'
     id = db.Column(db.Integer(), primary_key=True)
+    holder_id = db.Column(db.Integer(), db.ForeignKey('facultyinfo.id'))
+
     en_title = db.Column(db.String(64))
     en_title_abv = db.Column(db.String(64))
     th_title = db.Column(db.String(64))
     th_title_abv = db.Column(db.String(64))
-    ranking = db.Column(db.Integer())
+    level = db.Column(db.Integer())
 
     def __repr__(self):
-        return '<Academic Position %s>' % en_title
+        return '<Academic Position %s>' % self.en_title
+
+
+class Contact(db.Model):
+    __tablename__ = 'contacts'
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    office_id = db.Column(db.Integer(), db.ForeignKey('rooms.id'))
+
+    office = db.relationship('RoomDirectory', backref='residences',
+                                    foreign_keys='Contact.office_id')
+    mobile_phone = db.Column(db.String(16))
+    fax = db.Column(db.String(16))
+
+
+class Degree(db.Model):
+    __tablename__ = 'degrees'
+    id = db.Column(db.Integer(), primary_key=True)
+    en_name = db.Column(db.String(64))
+    th_name = db.Column(db.String(64))
+    level = db.Column(db.Integer())
+
+
+class Education(db.Model):
+    __tablename__ = 'educations'
+    id = db.Column(db.Integer(), primary_key=True)
+    holder_id = db.Column(db.Integer(), db.ForeignKey('facultyinfo.id'))
+    degree_id = db.Column(db.Integer(), db.ForeignKey('degrees.id'))
+
+    th_discipline = db.Column(db.String(255))
+    en_discipline = db.Column(db.String(255))
+    year = db.Column(db.String(4))
+    holder = db.relationship('FacultyInfo', backref='educations',
+                                foreign_keys='Education.holder_id')
+    degree = db.relationship('Degree', backref='desciplines',
+                                foreign_keys='Education.degree_id')
 
 
 class FacultyInfo(db.Model):
     __tablename__ = 'facultyinfo'
     id = db.Column(db.Integer(), primary_key=True)
-    office_id = db.Column(db.Integer(), db.ForeignKey('rooms.id'))
     academic_position_id = db.Column(db.Integer(),
                             db.ForeignKey('academic_positions.id'))
-    office = db.relationship('RoomDirectory', backref='residences',
-                                    foreign_keys='FacultyInfo.office_id')
-    mobile_phone = db.Column(db.String(16))
     car_license_plate = db.Column(db.String(8))
-    # fid = db.Column(db.Integer(), db.ForeignKey('users.id'))
     department_head = db.Column(db.Boolean(), default=False)
+    education_id = db.Column(db.Integer(), db.ForeignKey('educations.id'))
+
+    academic_position = db.relationship('AcademicPosition',
+                            backref='position_holders',
+                            foreign_keys='FacultyInfo.academic_position_id')
 
     def __repr__(self):
-        return '<Faculty Info %d>' % id
+        return '<Faculty Info %d>' % self.id
 
 
 class Department(db.Model):
@@ -302,7 +341,7 @@ class Building(db.Model):
 class RoomDirectory(db.Model):
     __tablename__ = 'rooms'
     id = db.Column(db.Integer(), primary_key=True)
-    residence_id = db.Column(db.Integer(), db.ForeignKey('facultyinfo.id'))
+    residence_id = db.Column(db.Integer(), db.ForeignKey('contacts.id'))
     building_id = db.Column(db.Integer(), db.ForeignKey('buildings.id'))
     roomid = db.Column(db.String(8))
     building = db.relationship('Building', backref='rooms',
