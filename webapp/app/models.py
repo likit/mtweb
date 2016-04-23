@@ -9,7 +9,7 @@ from flask.ext.login import UserMixin, AnonymousUserMixin
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer(), primary_key=True)
-    faculty_id = db.Column(db.Integer, db.ForeignKey('facultyinfo.id'))
+    # faculty_id = db.Column(db.Integer, db.ForeignKey('facultyinfo.id'))
     student_id = db.Column(db.Integer, db.ForeignKey('studentinfo.id'))
     affiliation_id = db.Column(db.Integer, db.ForeignKey('affiliations.id'))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
@@ -21,7 +21,13 @@ class User(db.Model):
 
     title = db.relationship('Title', backref='users',
                                 foreign_keys='User.title_id')
+
+    # one-to-one relationship with Contact
     contact = db.relationship('Contact', uselist=False, backref='user')
+
+    # one-to-one relationship with FacultyInfo
+    faculty_info = db.relationship('FacultyInfo',
+                                    uselist=False, backref='user')
 
     gender = db.Column(db.Integer()) # 0 for male and 1 for female
     username = db.Column(db.String(255))
@@ -41,8 +47,6 @@ class User(db.Model):
     job = db.relationship('Job', backref='users',
                             foreign_keys='User.job_id')
 
-    # one-to-one relationship with FacultyInfo
-    faculty_info = db.relationship('FacultyInfo', uselist=False)
 
     def __init__(self, email, th_firstname, th_lastname,
                     en_firstname, en_lastname,
@@ -243,18 +247,6 @@ class AcademicPosition(db.Model):
         return '<Academic Position %s>' % self.en_title
 
 
-class Contact(db.Model):
-    __tablename__ = 'contacts'
-    id = db.Column(db.Integer(), primary_key=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
-    office_id = db.Column(db.Integer(), db.ForeignKey('rooms.id'))
-
-    office = db.relationship('RoomDirectory', backref='residences',
-                                    foreign_keys='Contact.office_id')
-    mobile_phone = db.Column(db.String(16))
-    fax = db.Column(db.String(16))
-
-
 class Degree(db.Model):
     __tablename__ = 'degrees'
     id = db.Column(db.Integer(), primary_key=True)
@@ -278,9 +270,25 @@ class Education(db.Model):
                                 foreign_keys='Education.degree_id')
 
 
+class Contact(db.Model):
+    __tablename__ = 'contacts'
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    office_id = db.Column(db.Integer(), db.ForeignKey('rooms.id'))
+
+    office = db.relationship('RoomDirectory', backref='residences',
+                                    foreign_keys='Contact.office_id')
+    mobile_phone = db.Column(db.String(16))
+    fax = db.Column(db.String(16))
+
+    def __repr__(self):
+        return "<Contact %s>" % self.user.en_firstname
+
+
 class FacultyInfo(db.Model):
     __tablename__ = 'facultyinfo'
     id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
     academic_position_id = db.Column(db.Integer(),
                             db.ForeignKey('academic_positions.id'))
     car_license_plate = db.Column(db.String(8))
