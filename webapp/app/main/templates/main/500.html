@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block page_content %}
+<div align="center">
+    <img src="{{ url_for('static', filename='catface.jpg') }}" width="200px"/>
+    <h2>Apology!</h2>
+        <h4>The internal problem occurred.</h4>
+</div>
+{% endblock %}

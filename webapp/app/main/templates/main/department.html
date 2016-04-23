@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block page_content %}
+<h1>{{ department.en_name }}<br><small>{{ department.th_name }}</small></h1>
+    <h3>Staff</h3>
+    {% for member in department.members %}
+        <div class="alert alert-success">
+            <strong><a class="alert-link" href="{{ url_for('main.user', email=member.email) }}">{{ member.en_firstname }} {{ member.en_lastname }}</a></strong>
+            ({{ member.job.en_name }})<br>
+            <span class="glyphicon glyphicon-phone-alt" aria-hidden="true"></span>
+            {{ member.faculty_info.office.phone }}
+            <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+            Room {{ member.faculty_info.office.roomid }}, {{ member.faculty_info.office.building.en_name }}<br>
+            <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
+            <a class="alert-link" href="mailto:#">{{ member.email }}</a>
+        </div>
+    {% endfor %}
+    </ul>
+{% endblock %}
