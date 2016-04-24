@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block page_content %}
+{# {{ wtf.quick_form(form)}} #}
+
+<form class="form-horizontal" action="{{ url_for('main.edit_profile_by_admin') }}" method="POST">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.username.label(class="col-sm-3 control-label", for="username") }}
+        <div class="col-sm-4">
+            {{ form.username(class="form-control", size="24", maxlength="24") }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form.title.label(class="col-sm-3 control-label", for="title") }}
+        <div class="col-sm-4">
+            {{ form.title(class="form-control") }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form.th_firstname.label(class="col-sm-3 control-label", for="th_firstname") }}
+        <div class="col-sm-4">
+            {{ form.th_firstname(class="form-control", size="255", maxlength="255") }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form.th_lastname.label(class="col-sm-3 control-label", for="th_lastname") }}
+        <div class="col-sm-4">
+            {{ form.th_lastname(class="form-control", size="255", maxlength="255") }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form.en_firstname.label(class="col-sm-3 control-label", for="en_firstname") }}
+        <div class="col-sm-4">
+            {{ form.en_firstname(class="form-control", size="255", maxlength="255") }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form.en_lastname.label(class="col-sm-3 control-label", for="en_lastname") }}
+        <div class="col-sm-4">
+            {{ form.en_lastname(class="form-control", size="255", maxlength="255") }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form.email.label(class="col-sm-3 control-label", for="email") }}
+        <div class="col-sm-4">
+            {{ form.email(class="form-control", maxlength="255") }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form.office.label(class="col-sm-3 control-label", for="office") }}
+        <div class="col-sm-4">
+            {{ form.office(class="form-control", maxlength="24") }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form.mobile_phone.label(class="col-sm-3 control-label", for="mobile_phone") }}
+        <div class="col-sm-4">
+            {{ form.mobile_phone(class="form-control", maxlength="24") }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form.fax.label(class="col-sm-3 control-label", for="fax") }}
+        <div class="col-sm-4">
+            {{ form.fax(class="form-control", maxlength="24") }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form.car_license_plate.label(class="col-sm-3 control-label", for="car_license_plate") }}
+        <div class="col-sm-4">
+            {{ form.car_license_plate(class="form-control", maxlength="45") }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form.academic_position.label(class="col-sm-3 control-label", for="academic_position") }}
+        <div class="col-sm-4">
+            {{ form.academic_position(class="form-control") }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form.department.label(class="col-sm-3 control-label", for="department") }}
+        <div class="col-sm-4">
+            {{ form.department(class="form-control") }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form.job.label(class="col-sm-3 control-label", for="job") }}
+        <div class="col-sm-4">
+            {{ form.job(class="form-control") }}
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form.about_me.label(class="col-sm-3 control-label", for="about_me") }}
+        <div class="col-sm-4">
+            {{ form.about_me(class="form-control") }}
+        </div>
+    </div>
+    {{ form.submit(class="btn btn-default") }}
+</form>
+{% endblock %}
