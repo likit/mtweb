@@ -4,8 +4,15 @@
 {% block page_content %}
 {# {{ wtf.quick_form(form)}} #}
 
-<form class="form-horizontal" action="{{ url_for('main.edit_profile_by_admin') }}" method="POST">
+<form class="form-horizontal" method="POST">
     {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.usertype.label(class="col-sm-3 control-label", for="usertype") }}
+        <div class="col-sm-4">
+            {{ form.usertype(class="form-control") }}
+        </div>
+    </div>
+
     <div class="form-group">
         {{ form.username.label(class="col-sm-3 control-label", for="username") }}
         <div class="col-sm-4">

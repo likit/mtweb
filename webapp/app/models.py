@@ -15,13 +15,16 @@ class User(db.Model):
     systemrole_id = db.Column(db.Integer, db.ForeignKey('systemroles.id'))
     forumrole_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     title_id = db.Column(db.Integer(), db.ForeignKey('titles.id'))
+    usertype_id = db.Column(db.Integer(), db.ForeignKey('usertypes.id'))
     department_id = db.Column(db.Integer(),
                         db.ForeignKey('departments.id'))
     job_id = db.Column(db.Integer(), db.ForeignKey('jobs.id'))
 
-
     title = db.relationship('Title', backref='users',
                                 foreign_keys='User.title_id')
+
+    usertype = db.relationship('UserType', backref='users',
+                                foreign_keys='User.usertype_id')
 
     # one-to-one relationship with Contact
     contact = db.relationship('Contact', uselist=False, backref='user')
@@ -47,19 +50,6 @@ class User(db.Model):
                                 foreign_keys='User.department_id')
     job = db.relationship('Job', backref='users',
                             foreign_keys='User.job_id')
-
-
-    def __init__(self, email, th_firstname, th_lastname,
-                    en_firstname, en_lastname,
-                    password, role):
-        self.email = email
-        self.password = password
-        self.th_firstname = th_firstname
-        self.th_lastname = th_lastname
-        self.en_firstname = en_firstname
-        self.en_lastname = en_lastname
-        self.role = role
-        # self.user_type = user_type
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -199,11 +189,19 @@ class SystemPermission:
     ADMINISTER = 0x80
 
 
-class UserType:
-    STUDENT = 0x01
-    STAFF = 0x02
-    TEACHER = 0x04
-    CUSTOMER = 0x08
+class UserType(db.Model):
+    __tablename__ = 'usertypes'
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    name = db.Column(db.String(64))
+    permission = db.Column(db.Integer())
+
+    # STUDENT = 0x01
+    # STAFF = 0x02
+    # TEACHER = 0x04
+    # CUSTOMER = 0x08
+    def __repr__(self):
+        return '<UserType %s, permission=%d>' % (self.name, self.permission)
 
 
 class SystemRole(db.Model):

@@ -1,13 +1,65 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
+{% block styles %}
+{{ super() }}
+<style>
+    .profile-thumbnail {
+        border-radius: 50%;
+        position: absolute;
+    }
+    .profile-header {
+        min-height: 260px;
+        margin-left: 280px;
+    }
+    ul.dept-members {
+        list-style-type: none;
+        padding: 0px;
+        margin: 16px 0px 0px 0px;
+        border-top: 1px solid #e0e0e0;
+    }
+    div.post-tabs ul.posts {
+        margin: 0px;
+        border-top: none;
+    }
+    ul.dept-members li.member {
+        padding: 8px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    ul.dept-members li.member:hover {
+        background-color: #f0f0f0;
+    }
+    div.post-date {
+        float: right;
+    }
+    div.member-name {
+        font-weight: bold;
+    }
+    div.member-contact {
+        margin-left: 80px;
+        min-height: 50px;
+    }
+    div.post-footer {
+        text-align: right;
+    }
+</style>
+{% endblock %}
 
 {% block page_content %}
 <h1>{{ department.en_name }}<br><small>{{ department.th_name }}</small></h1>
     <h3>Staff</h3>
+    <ul class="dept-members">
     {% for member in department.members %}
-        <div class="alert alert-success">
+    <li class="member">
+        <div>
+            <img class="profile-thumbnail" height="90px" src="{{ member.about_me }}">
+        </div>
+        <div class="member-contact">
             <strong><a class="alert-link" href="{{ url_for('main.user', email=member.email) }}">{{ member.title.en_name }} {{ member.en_firstname }} {{ member.en_lastname }}</a></strong>
+            {% if member.faculty_info.academic_position.en_title != "None" %}
+            ({{ member.faculty_info.academic_position.en_title }})<br>
+            {% else %}
             ({{ member.job.en_name }})<br>
+            {% endif %}
             <span class="glyphicon glyphicon-phone-alt" aria-hidden="true"></span>
             Office: {{ member.contact.office.phone }}
             {% if member.contact.fax %}
@@ -21,6 +73,7 @@
             <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
             <a class="alert-link" href="mailto:#">{{ member.email }}</a>
         </div>
+    </li>
     {% endfor %}
     </ul>
 {% endblock %}
