@@ -3,7 +3,7 @@ from flask import (Blueprint, render_template,
                     flash, redirect, url_for, request, abort)
 from app.models import (SystemPermission, User, Department,
                         UserType, AcademicPosition, ForumPermission,
-                        Title, Job, RoomDirectory)
+                        Title, Job, RoomDirectory, FacultyInfo, Contact)
 from flask.ext.login import login_required, current_user
 from .forms import EditProfileForm, AdminEditProfileForm
 from app import db
@@ -103,79 +103,21 @@ def page_not_found(e):
     return render_template('main/404.html'), 404
 
 
-@main.route('/edit_profile_by_admin/<email>',
-                        methods=['GET', 'POST'])
-@main.route('/edit_profile_by_admin/',
-                        methods=['GET', 'POST'])
+@main.route('/webadmin/user/edit/<email>', methods=['GET', 'POST'])
+@main.route('/webadmin/user/edit', methods=['GET', 'POST'])
 def edit_profile_by_admin(email=None):
     '''
     For an admin to edit user's profile.
     '''
     form = AdminEditProfileForm()
-    # Setup dynamic select fields from data tables.
-    # Choices have to be set before validate_on_submit is invoked.
-    titles = [(t.id, '%s / %s' %(t.th_name, t.en_name))
-                for t in Title.query.all()]
-    acad_positions = [(d.id, '%s / %s' % (d.th_title, d.en_title))
-            for d in AcademicPosition.query.order_by('level').all()]
-    departments = [(d.id, '%s / %s' % (d.th_name, d.en_name))
-                for d in Department.query.order_by('th_name').all()]
-    jobs = [(j.id, '%s / %s' % (j.th_name, j.en_name))
-                    for j in Job.query.order_by('th_name').all()]
-    office = [(o.id, o.roomid)
-            for o in RoomDirectory.query.order_by('roomid').all()]
-
-    # Select field
-    form.job.choices = jobs
-    form.academic_position.choices = acad_positions
-    form.department.choices = departments
-    form.title.choices = titles
-    form.office.choices = office
-
-
+    _populate_user_form_field(form=form)
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).one()
         if not user:
             flash('{} has not been registered in the system.'.format(email))
             return redirect(url_for('.index'))
         else:
-            user.username = form.username.data
-            user.email = form.email.data
-            user.th_firstname = form.th_firstname.data
-            user.th_lastname = form.th_lastname.data
-            user.en_firstname = form.en_firstname.data
-            user.en_lastname = form.en_lastname.data
-            user.about_me = form.about_me.data
-            user.title = Title.query.get(form.title.data)
-            user.department = Department.query.get(form.department.data)
-            user.job = Job.query.get(form.job.data)
-
-            academic_position = \
-                    AcademicPosition.query.get(form.academic_position.data)
-            if not user.faculty_info:
-                user.faculty_info = FacultyInfo(
-                        car_license_plate=form.car_license_plate.data,
-                        department_head=False,
-                        academic_position=academic_position,
-                        )
-            else:
-                user.faculty_info.car_license_plate = \
-                        form.car_license_plate.data
-                user.faculty_info.department_head = False
-                user.faculty_info.academic_position = academic_position
-
-            office = RoomDirectory.query.get(form.office.data)
-            if not user.contact:
-                user.contact = Contact(
-                        office=office,
-                        mobile_phone=form.mobile_phone.data,
-                        fax=form.fax.data,
-                        )
-            else:
-                user.contact.office = office
-                user.contact.mobile_phone = form.mobile_phone.data
-                user.contact.fax = form.fax.data
-
+            _update_user_data(user=user, form=form)
             flash('Data has been saved.')
             return redirect(url_for('.edit_profile_by_admin',
                                             email=form.email.data))
@@ -196,6 +138,7 @@ def edit_profile_by_admin(email=None):
             form.title.default = user.title.id or ''
             form.job.default = user.job.id or ''
             form.office.default = user.contact.office.id
+            form.usertype.default = user.usertype.name
             form.process()
 
             # Other fields
@@ -217,3 +160,92 @@ def edit_profile_by_admin(email=None):
 
             return render_template('main/edit_profile_admin.html',
                                                 user=user, form=form)
+
+
+@main.route('/webadmin/user/list')
+@login_required
+def list_user():
+    users = sorted(User.query.all(), key=lambda x: x.created_on)
+    return render_template('main/user_list.html', users=users)
+
+@main.route('/webadmin/user/add', methods=['GET', 'POST'])
+@login_required
+def add_user():
+    form = AdminEditProfileForm()
+    _populate_user_form_field(form=form)
+
+    if form.validate_on_submit():
+        newuser = User()
+        _update_user_data(form=form, user=newuser)
+        return redirect(url_for('main.list_user'))
+        # user = User(email=form.email.data)
+
+    return render_template('main/edit_profile_admin.html', form=form)
+
+
+def _update_user_data(form, user=None):
+    if not user:
+        user = User()
+    else:
+        user.username = form.username.data
+        user.email = form.email.data
+        user.th_firstname = form.th_firstname.data
+        user.th_lastname = form.th_lastname.data
+        user.en_firstname = form.en_firstname.data
+        user.en_lastname = form.en_lastname.data
+        user.about_me = form.about_me.data
+        user.title = Title.query.get(form.title.data)
+        user.department = Department.query.get(form.department.data)
+        user.job = Job.query.get(form.job.data)
+
+        academic_position = \
+                AcademicPosition.query.get(form.academic_position.data)
+        if not user.faculty_info:
+            user.faculty_info = FacultyInfo(
+                    car_license_plate=form.car_license_plate.data,
+                    department_head=False,
+                    academic_position=academic_position,
+                    )
+        else:
+            user.faculty_info.car_license_plate = \
+                    form.car_license_plate.data
+            user.faculty_info.department_head = False
+            user.faculty_info.academic_position = academic_position
+
+        office = RoomDirectory.query.get(form.office.data)
+        if not user.contact:
+            user.contact = Contact(
+                    office=office,
+                    mobile_phone=form.mobile_phone.data,
+                    fax=form.fax.data,
+                    )
+        else:
+            user.contact.office = office
+            user.contact.mobile_phone = form.mobile_phone.data
+            user.contact.fax = form.fax.data
+
+
+def _populate_user_form_field(form):
+    # Setup dynamic select fields from data tables.
+    # Choices have to be set before validate_on_submit is invoked.
+    titles = [(t.id, '%s / %s' %(t.th_name, t.en_name))
+                for t in Title.query.all()]
+    acad_positions = [(d.id, '%s / %s' % (d.th_title, d.en_title))
+            for d in AcademicPosition.query.order_by('level').all()]
+    departments = [(d.id, '%s / %s' % (d.th_name, d.en_name))
+                for d in Department.query.order_by('th_name').all()]
+    jobs = [(j.id, '%s / %s' % (j.th_name, j.en_name))
+                    for j in Job.query.order_by('th_name').all()]
+    office = [(o.id, o.roomid)
+            for o in RoomDirectory.query.order_by('roomid').all()]
+
+    usertypes = [(u.name, u.name)
+            for u in UserType.query.order_by('name').all()]
+
+    # Select field
+    form.job.choices = jobs
+    form.academic_position.choices = acad_positions
+    form.department.choices = departments
+    form.title.choices = titles
+    form.office.choices = office
+    form.usertype.choices = usertypes
