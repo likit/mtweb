@@ -31,4 +31,20 @@ def correct_user_type_required(utype):
 
 
 def student_required(f):
-    return correct_user_type_required(UserType.STUDENT)(f)
+    return correct_user_type_required('STUDENT')(f)
+
+
+def faculty_required(f):
+    return correct_user_type_required('FACULTY')(f)
+
+
+def staff_required(f):
+    return correct_user_type_required('STAFF')(f)
+
+
+def customer_required(f):
+    return correct_user_type_required('CUSTOMER')(f)
+
+
+def webadmin_required(f):
+    return correct_user_type_required('ADMINISTRATOR')(f)
