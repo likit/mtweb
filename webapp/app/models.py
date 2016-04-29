@@ -11,11 +11,11 @@ class User(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     # faculty_id = db.Column(db.Integer, db.ForeignKey('facultyinfo.id'))
     student_id = db.Column(db.Integer, db.ForeignKey('studentinfo.id'))
-    affiliation_id = db.Column(db.Integer, db.ForeignKey('affiliations.id'))
-    systemrole_id = db.Column(db.Integer, db.ForeignKey('systemroles.id'))
-    forumrole_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    lab_affil_id = db.Column(db.Integer, db.ForeignKey('labs.id'))
+    system_role_id = db.Column(db.Integer, db.ForeignKey('systemroles.id'))
+    forum_role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     title_id = db.Column(db.Integer(), db.ForeignKey('titles.id'))
-    usertype_id = db.Column(db.Integer(), db.ForeignKey('usertypes.id'))
+    user_type_id = db.Column(db.Integer(), db.ForeignKey('usertypes.id'))
     department_id = db.Column(db.Integer(),
                         db.ForeignKey('departments.id'))
     job_id = db.Column(db.Integer(), db.ForeignKey('jobs.id'))
@@ -23,8 +23,17 @@ class User(db.Model):
     title = db.relationship('Title', backref='users',
                                 foreign_keys='User.title_id')
 
-    usertype = db.relationship('UserType', backref='users',
-                                foreign_keys='User.usertype_id')
+    user_type = db.relationship('UserType', backref='users',
+                                foreign_keys='User.user_type_id')
+
+    system_role = db.relationship('SystemRole', backref='users',
+                                foreign_keys='User.system_role_id')
+
+    forum_role = db.relationship('ForumRole', backref='users',
+                                foreign_keys='User.forum_role_id')
+
+    lab_affil = db.relationship('Lab', backref='members',
+                                foreign_keys='User.lab_affil_id')
 
     # one-to-one relationship with Contact
     contact = db.relationship('Contact', uselist=False, backref='user')
@@ -42,10 +51,8 @@ class User(db.Model):
     en_firstname = db.Column(db.String(128), unique=True)
     en_lastname = db.Column(db.String(128), unique=True)
     _password = db.Column('password', db.String(60))
-    user_type = db.Column(db.Integer)
     about_me = db.Column(db.Text())
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
-    # location = db.Column(db.String(64))
     department = db.relationship('Department', backref='members',
                                 foreign_keys='User.department_id')
     job = db.relationship('Job', backref='users',
@@ -79,7 +86,7 @@ class User(db.Model):
                 (self.role.permissions & permissions) == permissions
 
     def correct_user_type(self, utype):
-        return self.user_type is not None and (self.user_type) == utype
+        return self.user_type is not None and (self.user_type.name) == utype
 
     def is_administrator(self):
         return self.can(Permission.ADMINISTER)
@@ -159,7 +166,7 @@ class Affiliation(db.Model):
     province = db.Column(db.String(255))
     district = db.Column(db.String(255))
     address = db.Column(db.Text())
-    users = db.relationship('User', backref='affiliation', lazy='dynamic')
+    # users = db.relationship('User', backref='affiliation', lazy='dynamic')
     added_on = db.Column(db.DateTime(), default=datetime.utcnow)
     password_id = db.Column(db.Integer, db.ForeignKey('orgpwds.id'))
     service_id = db.Column(db.Integer, db.ForeignKey('services.id'))
@@ -211,8 +218,6 @@ class SystemRole(db.Model):
     name = db.Column(db.String(64), unique=True)
     default = db.Column(db.Boolean, default=False, index=True)
     permissions = db.Column(db.Integer)
-    users = db.relationship('User', backref='systemrole',
-                                foreign_keys='SystemRole.user_id')
 
     def __repr__(self):
         return '<SystemRole %s>' % self.name
@@ -242,8 +247,6 @@ class ForumRole(db.Model):
     name = db.Column(db.String(64), unique=True)
     default = db.Column(db.Boolean, default=False, index=True)
     permissions = db.Column(db.Integer)
-    users = db.relationship('User', backref='forumrole',
-                                foreign_keys='ForumRole.user_id')
 
     def __repr__(self):
         return '<Role %s>' % self.name
@@ -405,3 +408,157 @@ class StudentInfo(db.Model):
 
     def __repr__(self):
         return '<Student ID %s>' % self.studentid
+
+
+class HealthRegion(db.Model):
+    __tablename__ = 'healthregions'
+    id = db.Column(db.Integer(), primary_key=True)
+
+    def __repr__(self):
+        return "<HealthRegion %d>" % self.id
+
+
+class GeoRegion(db.Model):
+    __tablename__ = 'georegions'
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(64))
+
+    def __repr__(self):
+        return "<GeoRegion %s>" % self.name
+
+
+class Province(db.Model):
+    __tablename__ = 'provinces'
+    id = db.Column(db.Integer(), primary_key=True)
+    health_region_id = db.Column(db.Integer(),
+                            db.ForeignKey('healthregions.id'))
+    geo_region_id = db.Column(db.Integer(),
+                            db.ForeignKey('georegions.id'))
+    amphur_id = db.Column(db.Integer(),
+                            db.ForeignKey('amphurs.id'))
+
+    name = db.Column(db.String(64))
+    health_region = db.relationship('HealthRegion',
+                        uselist=False, backref='provinces',
+                        foreign_keys='Province.health_region_id')
+
+    geo_region = db.relationship('GeoRegion',
+                        uselist=False, backref='provinces',
+                        foreign_keys='Province.geo_region_id')
+
+    def __repr__(self):
+        return "<Province %s>" % self.name
+
+
+class Amphur(db.Model):
+    __tablename__ = 'amphurs'
+    id = db.Column(db.Integer(), primary_key=True)
+    province_id = db.Column(db.Integer(), db.ForeignKey('provinces.id'))
+    name = db.Column(db.String(128))
+    province = db.relationship('Province',
+                        uselist=False, backref='amphurs',
+                        foreign_keys='Amphur.province_id')
+
+    def __repr__(self):
+        return "<Amphur %s>" % self.name
+
+
+class District(db.Model):
+    __tablename__ = 'districts'
+    id = db.Column(db.Integer(), primary_key=True)
+    amphur_id = db.Column(db.Integer(), db.ForeignKey('amphurs.id'))
+    name = db.Column(db.String(128))
+    amphur = db.relationship('Amphur',
+                        uselist=False, backref='districts',
+                        foreign_keys='District.amphur_id')
+
+    def __repr__(self):
+        return "<District %s>" % self.name
+
+
+class LabAddress(db.Model):
+    '''
+        Company or lab address.
+    '''
+    __tablename__ = 'labaddresses'
+    id = db.Column(db.Integer(), primary_key=True)
+    district_id = db.Column(db.Integer(), db.ForeignKey('districts.id'))
+    amphur_id = db.Column(db.Integer(), db.ForeignKey('amphurs.id'))
+    province_id = db.Column(db.Integer(), db.ForeignKey('provinces.id'))
+    address = db.Column(db.Text())
+
+    district = db.relationship('District', uselist=False,
+                                foreign_keys='LabAddress.district_id')
+    amphur = db.relationship('Amphur', uselist=False,
+                                foreign_keys='LabAddress.amphur_id')
+    province = db.relationship('Province', uselist=False,
+                                foreign_keys='LabAddress.province_id')
+    hospital = db.relationship('Hospital', backref='contact', uselist=False)
+
+    def __repr__(self):
+        return "<LabAddress %s>" % self.address
+
+
+class Hospital(db.Model):
+    '''
+        Hospital Info.
+    '''
+    __tablename__ = 'hospitals'
+    id = db.Column(db.Integer(), primary_key=True)
+    # lab_id = db.Column(db.Integer(), db.ForeignKey('labs.id'))
+    address_id = db.Column(db.Integer(), db.ForeignKey('labaddresses.id'))
+    name = db.Column(db.String(128))
+
+    def __repr__(self):
+        return "<Hospital %s>" % self.name
+
+
+class Lab(db.Model):
+    '''
+        Lab Info.
+    '''
+    __tablename__ = 'labs'
+
+    id = db.Column(db.Integer(), primary_key=True)
+    hospital_id = db.Column(db.Integer(), db.ForeignKey('hospitals.id'))
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    # qa_program_id = db.Column(db.Integer(), db.ForeignKey('qaprograms.id'))
+    phone_id = db.Column(db.Integer(), db.ForeignKey('labphones.id'))
+    fax_id = db.Column(db.Integer(), db.ForeignKey('labfaxes.id'))
+    name = db.Column(db.String(128))
+
+    # qa_program = db.relationship('QAProgram', backref='labs',
+    #                                 foreign_keys='Lab.qa_program_id')
+    hospital = db.relationship('Hospital', backref='labs',
+                                foreign_keys='Lab.hospital_id')
+
+    def __repr__(self):
+        return "<Hospital %s>" % self.name
+
+
+class LabPhone(db.Model):
+    __tablename__ = 'labphones'
+    id = db.Column(db.Integer(), primary_key=True)
+    lab_id = db.Column(db.Integer(), db.ForeignKey('labs.id'))
+    number = db.Column(db.String(32))
+
+    lab = db.relationship('Lab', backref='phones',
+                            foreign_keys='LabPhone.lab_id')
+
+    def __repr__(self):
+        return "<Number %s, id=%d>" % (self.number, self.id)
+
+
+class LabFax(db.Model):
+    __tablename__ = 'labfaxes'
+    id = db.Column(db.Integer(), primary_key=True)
+    lab_id = db.Column(db.Integer(), db.ForeignKey('labs.id'))
+    number = db.Column(db.String(32))
+
+    lab = db.relationship('Lab', backref='faxes',
+                            foreign_keys='LabFax.lab_id')
+
+    def __repr__(self):
+        return "<Number %s, id=%d>" % (self.number, self.id)
+# 
+# from app.eqa.models import QAProgram
