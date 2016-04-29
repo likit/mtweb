@@ -1,25 +1,52 @@
-<!doctype html>
-<html>
-    <head>
-        <title>MTWEB Portal</title>
-    </head>
-    <body>
-        {% if current_user.is_authenticated %}
-        <p><h4>You're logged in!</h4></p>
-        {% else %}
-        <p><h4>You're not logged in!</h4></p>
-        <p>Please log in or register.</p>
-        {% endif %}
-        <ul>
-            <li><a href={{ url_for("main.index") }}>Home</a></li>
-            <li><a href={{ url_for("services.index") }}>Services</a></li>
-            {% if not current_user.is_authenticated %}
-                <li><a href={{ url_for("auth.register") }}>Register</a></li>
-                <li><a href={{ url_for("auth.login") }}>Login</a></li>
-            {% else %}
-                <li><a href={{ url_for("eqa.customer_results") }}>Customer Results</a></li>
-                <li><a href={{ url_for("auth.logout") }}>Logout</a></li>
-            {% endif %}
-        </ul>
-    </body>
-</html>
+{% extends "base.html" %}
+{% block page_content %}
+    <div class="container">
+        <div class="row">
+            <h1>Welcome to MUMT EQA Services</h1>
+            <div>
+                {{ current_user.th_firstname }} {{ current_user.th_lastname }}
+                {{ current_user.lab_affil.name }}
+                {{ current_user.lab_affil.hospital.name }}
+                {{ current_user.lab_affil.hospital.contact.address}}
+                {{ current_user.lab_affil.hospital.contact.district.name}}
+                {{ current_user.lab_affil.hospital.contact.amphur.name}}
+                {{ current_user.lab_affil.hospital.contact.province.name}}
+                Phone: 
+                {% for phone in current_user.lab_affil.phones %}
+                    {{ phone.number }}, 
+                {% endfor %}
+                Fax: 
+                {% for fax in current_user.lab_affil.faxes %}
+                    {{ fax.number }}, 
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            <div>
+                <h2>Your affiliation has been registered for:</h2>
+                <table class="table table-striped">
+                    <thead>
+                        <th>Program</th>
+                        <th>Code</th>
+                        <th>Authorized</th>
+                    </thead>
+                {% for c in current_user.lab_affil.eqa_customer_codes %}
+                    {% if current_user.id == c.current_authorized_user.id %}
+                    <tr>
+                        <td>{{ c.program.en_name }}</td>
+                        <td>{{ c.program.code_name }}:{{ c.customer_code }}</td>
+                        <td>
+                            <a href='{{ url_for('eqa.results', customer_code=c.customer_code) }}'><span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span></a></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td>{{ c.program.en_name }}</td>
+                        <td>{{ c.program.code_name }}:{{ c.customer_code }}</td>
+                        <td><a href='{{ url_for('eqa.activate', customer_code=c.customer_code) }}'><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></a></td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+                </table>
+            </div>
+    </div>
+{% endblock %}

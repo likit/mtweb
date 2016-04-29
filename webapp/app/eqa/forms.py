@@ -1,10 +1,11 @@
 from flask.ext.wtf import Form
 from wtforms import (StringField, SubmitField, FloatField,
-                        TextField, SelectField)
+                        TextField, SelectField, HiddenField)
 from wtforms.validators import DataRequired, Optional
 
+
 class ResultForm(Form):
-    program_id = StringField('Program ID', validators=[DataRequired()])
+    program_id = StringField('Customer Code', validators=[DataRequired()])
 
     # these info should be pull from db in the future
     methods = {
@@ -142,4 +143,10 @@ class ResultForm(Form):
             choices=[(m,m) for m in methods['uric']]
             )
     comment = TextField('Comment', validators=[Optional()])
+    submit = SubmitField('Submit')
+
+
+class ActivationForm(Form):
+    code = StringField('Code', validators=[DataRequired()])
+    customer_code=  HiddenField('Customer code')
     submit = SubmitField('Submit')
