@@ -45,5 +45,5 @@ class AdminEditProfileForm(Form):
     gender = IntegerField('Gender')
     mobile_phone = StringField('Mobile phone', validators=[Length(0,24)])
     fax = StringField('Fax', validators=[Length(0,24)])
-    usertype = SelectField('User Type', validators=[DataRequired()])
+    user_type = SelectField('User Type', validators=[DataRequired()])
     submit = SubmitField('Submit')
