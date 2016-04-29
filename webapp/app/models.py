@@ -11,6 +11,8 @@ class User(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     # faculty_id = db.Column(db.Integer, db.ForeignKey('facultyinfo.id'))
     student_id = db.Column(db.Integer, db.ForeignKey('studentinfo.id'))
+    eqa_customer_code_id = db.Column(db.Integer,
+                            db.ForeignKey('customercodes.id'))
     lab_affil_id = db.Column(db.Integer, db.ForeignKey('labs.id'))
     system_role_id = db.Column(db.Integer, db.ForeignKey('systemroles.id'))
     forum_role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
@@ -522,13 +524,12 @@ class Lab(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     hospital_id = db.Column(db.Integer(), db.ForeignKey('hospitals.id'))
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
-    # qa_program_id = db.Column(db.Integer(), db.ForeignKey('qaprograms.id'))
+    eqa_customer_code_id = db.Column(db.Integer(),
+                            db.ForeignKey('customercodes.id'))
     phone_id = db.Column(db.Integer(), db.ForeignKey('labphones.id'))
     fax_id = db.Column(db.Integer(), db.ForeignKey('labfaxes.id'))
     name = db.Column(db.String(128))
 
-    # qa_program = db.relationship('QAProgram', backref='labs',
-    #                                 foreign_keys='Lab.qa_program_id')
     hospital = db.relationship('Hospital', backref='labs',
                                 foreign_keys='Lab.hospital_id')
 
@@ -560,5 +561,5 @@ class LabFax(db.Model):
 
     def __repr__(self):
         return "<Number %s, id=%d>" % (self.number, self.id)
-# 
-# from app.eqa.models import QAProgram
+
+from app.eqa.models import QAProgram
