@@ -13,6 +13,7 @@ class QACustomerCode(db.Model):
                             foreign_keys='QACustomerCode.qa_program_id')
 
     lab = db.relationship('Lab', uselist=False, backref='customer_code')
+    current_authorized_user = db.relationship('User', uselist=False)
 
     def __repr__(self):
         return "<QACustomerCode %s>" % self.customer_code
