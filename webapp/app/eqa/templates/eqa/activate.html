@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block page_content %}
+    <div class="container">
+        <div class="row">
+            <h1>Account Authorization</h1>
+            <h4>Enter an OTP code below to authorize this account for {{ cc.program.code_name }}:{{ cc.customer_code }}</h4>
+            <div class="col-md-4">
+                {{ wtf.quick_form(form)}}
+            </div>
+        </div>
+        <div class="row">
+            <p>Cannot find the OTP code? Contact the program representative to recieve a new code as soon as possible.</p>
+        </div>
+    </div>
+{% endblock %}
