@@ -42,17 +42,16 @@ def register():
             return render_template('auth/register.html', form=form)
         else:
             # assign default role to all new users
-            systemrole = SystemRole.query.filter_by(default=True).first()
-            forumrole = ForumRole.query.filter_by(default=True).first()
+            system_role = SystemRole.query.filter_by(default=True).first()
+            forum_role = ForumRole.query.filter_by(default=True).first()
             if (form.email.data.endswith('mahidol.edu') or
                     form.email.data.endswith('mahidol.ac.th')):
                 # check the student database to see if the email exists
                 # check the staff database to see if the email exists
-                #TODO: user_type = UserType.STUDENT
+                # usertype = UserType.query.filter_by(name='STUDENT').one()
                 pass
             else:
-                #TODO: user_type = UserType.CUSTOMER
-                pass
+                user_type = UserType.query.filter_by(name='CUSTOMER').one()
 
             user = User(th_firstname=form.th_firstname.data,
                     th_lastname=form.th_lastname.data,
@@ -60,9 +59,9 @@ def register():
                     en_lastname=form.en_lastname.data,
                     email=form.email.data,
                     password=form.password.data,
-                    systemrole=role,
-                    forumrole=role,
-                    # user_type=user_type,
+                    system_role=system_role,
+                    forum_role=forum_role,
+                    user_type=user_type,
                     )
 
             db.session.add(user)
