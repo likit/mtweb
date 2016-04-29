@@ -8,6 +8,7 @@ from flask.ext.login import login_required, current_user
 from .forms import EditProfileForm, AdminEditProfileForm
 from app import db
 from operator import itemgetter
+from app.decorators import (webadmin_required) 
 
 main = Blueprint('main', __name__, template_folder='templates')
 
@@ -105,6 +106,8 @@ def page_not_found(e):
 
 @main.route('/webadmin/user/edit/<email>', methods=['GET', 'POST'])
 @main.route('/webadmin/user/edit', methods=['GET', 'POST'])
+@login_required
+@webadmin_required
 def edit_profile_by_admin(email=None):
     '''
     For an admin to edit user's profile.
@@ -138,7 +141,7 @@ def edit_profile_by_admin(email=None):
             form.title.default = user.title.id or ''
             form.job.default = user.job.id or ''
             form.office.default = user.contact.office.id
-            form.usertype.default = user.usertype.name
+            form.user_type.default = user.user_type.name
             form.process()
 
             # Other fields
@@ -164,12 +167,14 @@ def edit_profile_by_admin(email=None):
 
 @main.route('/webadmin/user/list')
 @login_required
+@webadmin_required
 def list_user():
     users = sorted(User.query.all(), key=lambda x: x.created_on)
     return render_template('main/user_list.html', users=users)
 
 @main.route('/webadmin/user/add', methods=['GET', 'POST'])
 @login_required
+@webadmin_required
 def add_user():
     form = AdminEditProfileForm()
     _populate_user_form_field(form=form)
@@ -187,6 +192,8 @@ def _update_user_data(form, user=None):
     if not user:
         user = User()
     else:
+        user.user_type = \
+                UserType.query.filter_by(name=form.user_type.data).one()
         user.username = form.username.data
         user.email = form.email.data
         user.th_firstname = form.th_firstname.data
@@ -239,7 +246,7 @@ def _populate_user_form_field(form):
     office = [(o.id, o.roomid)
             for o in RoomDirectory.query.order_by('roomid').all()]
 
-    usertypes = [(u.name, u.name)
+    user_types = [(u.name, u.name)
             for u in UserType.query.order_by('name').all()]
 
     # Select field
@@ -248,4 +255,4 @@ def _populate_user_form_field(form):
     form.department.choices = departments
     form.title.choices = titles
     form.office.choices = office
-    form.usertype.choices = usertypes
+    form.user_type.choices = user_types
