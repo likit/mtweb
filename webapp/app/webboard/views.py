@@ -1,8 +1,7 @@
 from flask import (Blueprint, flash, redirect, url_for, render_template)
 from app.models import User, ForumPermission
 from flask.ext.login import login_required
-from app.decorators import (admin_required,
-                            permission_required, student_required)
+from app.decorators import (admin_required, permission_required)
 
 webboard = Blueprint('webboard', __name__, template_folder='templates')
 
@@ -14,7 +13,7 @@ def for_admin_only():
 
 
 @webboard.route('/')
-@student_required
+# @student_required
 def index():
     return 'Webboard index page'
 
