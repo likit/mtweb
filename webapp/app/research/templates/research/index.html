@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" type="text/css"
+    href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.1/nv.d3.min.css">
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script type="text/javascript" charset="utf8"
+    src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.14/d3.min.js"></script>
+<script type="text/javascript" charset="utf8"
+    src="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.1/nv.d3.min.js"></script>
+
+<script>
+    var pub_per_month = {{ pub_per_month|tojson|safe }};
+    nv.addGraph(function() {
+        var chart = nv.models.lineChart()
+                        .margin({left: 100})
+                        .x(function(d) { return d.key; })
+                        .y(function(d) { return d.y; })
+                        .useInteractiveGuideline(true)
+                        .showLegend(true)
+                        .showYAxis(true)
+                        .showXAxis(true);
+        chart.xAxis.axisLabel('Month');
+        chart.yAxis.axisLabel('Number');
+        d3.select('#pub_per_month_chart svg')
+            .datum(pub_per_month)
+            .call(chart);
+
+        nv.utils.windowResize(function() { chart.update() });
+        return chart;
+    });
+</script>
+{% endblock %}
+
+{% block page_content %}
+    <div class="container">
+        <div class="row">
+            <h1>Research Article in {{ year }}</h1>
+            <div id="pub_per_month_chart"><svg></svg></div>
+            <div>
+                <table class="table table-striped">
+                    <thead>
+                        <th>No.</th>
+                        <th>Title</th>
+                        <th>Year</th>
+                        <th>Publication</th>
+                        <th>Cited</th>
+                        <th>Authors</th>
+                    </thead>
+                    {% for pub in pubs %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ pub.title }}</td>
+                        <td>{{ pub.year }}</td>
+                        <td>{{ pub.publication_name }}</td>
+                        <td>{{ pub.citedby_count }}</td>
+                        <td>{{ pub.authors }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
