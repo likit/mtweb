@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" type="text/css"
+    href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.1/nv.d3.min.css">
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script type="text/javascript" charset="utf8"
+    src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.14/d3.min.js"></script>
+<script type="text/javascript" charset="utf8"
+    src="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.1/nv.d3.min.js"></script>
+
+<script>
+    var pub_per_year = {{ pub_per_year|tojson|safe }};
+    nv.addGraph(function() {
+        var chart = nv.models.lineChart()
+                        .margin({left: 100})
+                        .x(function(d) { return d.key; })
+                        .y(function(d) { return d.y; })
+                        .useInteractiveGuideline(true)
+                        .showLegend(true)
+                        .showYAxis(true)
+                        .showXAxis(true);
+        chart.xAxis.axisLabel('Year');
+        chart.yAxis.axisLabel('Number');
+        d3.select('#pub_per_year_chart svg')
+            .datum(pub_per_year)
+            .call(chart);
+
+        nv.utils.windowResize(function() { chart.update() });
+        return chart;
+    });
+</script>
+<script>
+    var cite_per_year = {{ cite_per_year|tojson|safe }};
+    nv.addGraph(function() {
+        var chart = nv.models.lineChart()
+                        .margin({left: 100})
+                        .x(function(d) { return d.key; })
+                        .y(function(d) { return d.y; })
+                        .useInteractiveGuideline(true)
+                        .showLegend(true)
+                        .showYAxis(true)
+                        .showXAxis(true);
+        chart.xAxis.axisLabel('Year');
+        chart.yAxis.axisLabel('Number');
+        d3.select('#cite_per_year_chart svg')
+            .datum(cite_per_year)
+            .call(chart);
+
+        nv.utils.windowResize(function() { chart.update() });
+        return chart;
+    });
+</script>
+<script>
+    var all_per_year = {{ all_per_year|tojson|safe }};
+    nv.addGraph(function() {
+        var chart = nv.models.lineChart()
+                        .margin({left: 100})
+                        .x(function(d) { return d.key; })
+                        .y(function(d) { return d.y; })
+                        .useInteractiveGuideline(true)
+                        .showLegend(true)
+                        .showYAxis(true)
+                        .showXAxis(true);
+        chart.xAxis.axisLabel('Year');
+        chart.yAxis.axisLabel('Number');
+        d3.select('#all_per_year_chart svg')
+            .datum(all_per_year)
+            .call(chart);
+
+        nv.utils.windowResize(function() { chart.update() });
+        return chart;
+    });
+</script>
+{% endblock %}
+
+{% block page_content %}
+    <div class="container">
+        <div class="row">
+            <h1>Research Articles</h1>
+            <div class="well">
+                <h3>Total <strong>{{ total_articles }}</strong> Articles</h3>
+                <h3>Cited by <strong>{{ cumcitation }}</strong> Articles</h3>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div id="all_per_year_chart"><svg></svg></div>
+                    <div id="pub_per_year_chart"><svg></svg></div>
+                    <div id="cite_per_year_chart"><svg></svg></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div>
+                <h2>Summary</h2>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <th>Year</th>
+                                <th>Publication</th>
+                                <th>Citation</th>
+                                <th>Cumulative citation</th>
+                                <th>Publication List</th>
+                            </thead>
+                            {% for d in data %}
+                            <tr>
+                                <td>{{ d[0] }}</td></a>
+                                <td>{{ d[1] }}</td>
+                                <td>{{ d[2] }}</td>
+                                <td>{{ d[3] }}</td>
+                                <td><a href="{{ url_for('research.index', year=d[0]) }}">
+                                        <span class="glyphicon glyphicon-th-list"></span></a></td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

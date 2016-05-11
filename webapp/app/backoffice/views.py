@@ -3,6 +3,7 @@ import json
 import httplib2
 
 import gspread
+from collections import defaultdict
 from flask import (Blueprint, render_template, request,
                     flash, redirect, url_for, request, abort, session)
 from flask.ext.login import login_required, current_user
@@ -82,6 +83,7 @@ def oauth2callback():
         session['credentials'] = credentials.to_json()
         return redirect(url_for('backoffice.index'))
 
+
 @backoffice.route('/gdrive/loadsheet/<id>')
 def loadsheet(id):
     credentials = client.OAuth2Credentials.from_json(session['credentials'])
@@ -89,3 +91,41 @@ def loadsheet(id):
     worksheet = gc.open_by_key(id).sheet1
     val = worksheet.acell('A2').value
     return str(val)
+
+
+def parse_funding_data(worksheet, agencies, years):
+    row = 4  # a starting row
+    print(worksheet.title)
+    while True:
+        fund_cell = 'D%d' % row
+        agency_cell = 'A%d' % row
+        val = worksheet.acell(fund_cell).value
+        if val == 'END':
+            return
+        elif val.strip() == '':
+            agency = worksheet.acell(agency_cell).value
+            row += 1
+            continue
+        else:
+            agencies[agency][worksheet.title] = float(val)
+            years[worksheet.title] += float(val)
+            row += 1
+
+
+# @backoffice.route('/gdrive/loadsheet/research_funds/')
+def get_research_funds(year=None):
+    credentials = client.OAuth2Credentials.from_json(session['credentials'])
+    gc = gspread.authorize(credentials)
+    # worksheet = gc.open("research_funds.xls").sheet1
+    workbook = gc.open("research_funds.xls")
+    agencies = defaultdict(dict)
+    years = defaultdict(float)
+
+    if not year:
+        for worksheet in workbook.worksheets():
+            parse_funding_data(worksheet, agencies, years)
+    else:
+        worksheet = workbook.worksheet(year)
+        parse_funding_data(worksheet, agencies, years)
+
+    return agencies, years
