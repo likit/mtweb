@@ -5,12 +5,13 @@ import time
 import re
 from datetime import datetime
 from collections import namedtuple, defaultdict
+from operator import itemgetter
 
 from flask import (Blueprint, render_template, request,
                     flash, redirect, url_for, abort)
 from flask.ext.login import login_required, current_user
 from app import db
-from app.research.models import ScopusAbstract, ScopusAuthor
+from app.research.models import ScopusAbstract, ScopusAuthor, FundingAgency
 from app import backoffice
 
 research = Blueprint('research', __name__, template_folder='templates')
@@ -40,6 +41,7 @@ def overview():
     author_count = defaultdict(int)
     ppy = defaultdict(int) # pub per year
     cpy = defaultdict(int) # citation per year
+    h_index = defaultdict(list)
     total_articles = 0
     for p in ScopusAbstract.query.all():
         total_articles += 1
@@ -49,63 +51,89 @@ def overview():
 
         ppy[p.cover_date.year] += 1
         cpy[p.cover_date.year] += int(p.citedby_count)
+        h_index[p.cover_date.year].append(int(p.citedby_count))
 
-        year_range = range(min(sorted(ppy.keys())),
-                            datetime.utcnow().year+1)
-        pub_per_year = []
-        for i in year_range:
-            if i in ppy:
-                pub_per_year.append({'key': i, 'y': ppy[i]})
-            else:
-                pub_per_year.append({'key': i, 'y': 0})
+    year_range = range(min(sorted(ppy.keys())),
+                        datetime.utcnow().year+1)
+    for k in h_index:
+        h_index[k] = sorted(h_index[k], reverse=True)
 
-        cite_per_year = []
-        for i in year_range:
-            if i in cpy:
-                cite_per_year.append({'key': i, 'y': cpy[i]})
-            else:
-                cite_per_year.append({'key': i, 'y': 0})
+    h_index_per_year = []
+    for i in year_range:
+        if i in h_index:
+            for n, k in enumerate(h_index[i], start=1):
+                if n > k:
+                    h_index_per_year.append({'key': i, 'y': n-1})
+                    break
+        else:
+            h_index_per_year.append({'key': i, 'y': 0})
 
-        cite_per_year_data=[{'values': cite_per_year,
-                                'key': 'Citation',
-                                'color': '#F90321'}
-                                ]
+    print(h_index_per_year)
 
-        all_per_year_data=[{'values': cite_per_year,
-                                'key': 'Citation',
-                                'color': '#F90321'},
-                            {'values': pub_per_year,
-                                'key': 'Publication',
-                                'color': '#0033cc'}
-                                ]
+    pub_per_year = []
+    for i in year_range:
+        if i in ppy:
+            pub_per_year.append({'key': i, 'y': ppy[i]})
+        else:
+            pub_per_year.append({'key': i, 'y': 0})
 
-        pub_per_year_data=[{'values': pub_per_year,
-                                'key': 'Publication',
-                                'color': '#0033cc'}
-                                ]
+    cite_per_year = []
+    for i in year_range:
+        if i in cpy:
+            cite_per_year.append({'key': i, 'y': cpy[i]})
+        else:
+            cite_per_year.append({'key': i, 'y': 0})
 
-        import operator
+    cite_per_year_data=[{'values': cite_per_year,
+                            'key': 'Citation',
+                            'color': '#F90321'}
+                            ]
 
-        top_author_count = sorted(author_count.items(),
-                                key=operator.itemgetter(1))[:10]
+    all_per_year_data=[{'values': [[c['key'], c['y']] for c in cite_per_year],
+                            'key': 'Citation',
+                            'color': '#333'},
+                        {'values': [[p['key'], p['y']] for p in pub_per_year],
+                            'key': 'Publication',
+                            'bar': True,
+                            'color': '#ccf'}
+                            ]
 
-        data = []
-        cumcitation = 0
-        for i in year_range:
-            cumcitation += cpy.get(i, 0)
-            data.append((i, ppy.get(i, 0), cpy.get(i, 0), cumcitation))
+    h_pub_per_year_data=[{'values': [[c['key'], c['y']] for c in h_index_per_year],
+                            'key': 'h-index',
+                            'color': '#333'},
+                        {'values': [[p['key'], p['y']] for p in pub_per_year],
+                            'key': 'Publication',
+                            'bar': True,
+                            'color': '#ccf'}
+                            ]
 
-    agencies, funding_years = backoffice.views.get_research_funds()
+    pub_per_year_data=[{'values': pub_per_year,
+                            'key': 'Publication',
+                            'color': '#0033cc'}
+                            ]
+    import operator
+
+    top_author_count = sorted(author_count.items(),
+                            key=operator.itemgetter(1))[:10]
+
+    data = []
+    cumcitation = 0
+    for i in year_range:
+        cumcitation += cpy.get(i, 0)
+        data.append((i, ppy.get(i, 0), cpy.get(i, 0), cumcitation))
+
+    # h_index = sorted(h_index, key=itemgetter(1), reverse=True)
+    # print(h_index[:10])
 
     return render_template('research/overview.html',
             pub_per_year=pub_per_year_data,
             cite_per_year=cite_per_year_data,
             all_per_year=all_per_year_data,
+            h_pub_per_year=h_pub_per_year_data,
             top_author_count=top_author_count,
             data=data,
             total_articles=total_articles,
             cumcitation=cumcitation,
-            funding_years=funding_years,
             )
 
 
@@ -141,16 +169,24 @@ def index(year=None):
 
     pub_per_month_data=[{'values': pub_per_month, 'key': 'Publication'}]
 
-    agencies, funding_years = backoffice.views.get_research_funds(str(year))
-    fundings = [{"label": a, "value": v[str(year)]}
-                    for a, v in agencies.iteritems()]
+    fundings = [{"label": f.name, "value": f.amount}
+                for f in FundingAgency.query.filter_by(year=str(year))]
+    tyf = sum([i['value'] for i in fundings])
+
+    import locale
+    pub_cost = tyf/len(pubs)
+    locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
+    tyf = locale.currency(tyf, symbol=False, grouping=True)
+    pub_cost = locale.currency(pub_cost, symbol=False, grouping=True)
+
 
     return render_template('research/index.html',
             pubs=abstracts,
             year=year,
             pub_per_month=pub_per_month_data,
-            funding_years=funding_years,
-            fundings=fundings)
+            total_year_funding=tyf,
+            fundings=fundings,
+            pub_cost=pub_cost)
 
 
 @research.route('/research/profile/')
