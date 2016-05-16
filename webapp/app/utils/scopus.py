@@ -98,8 +98,8 @@ def add_affil(affils):
 
 
 def update(year):
-    query = 'AFFILORG("faculty of medical technology,mahidol university")' \
-                'AND PUBYEAR IS %s AND DOCTYPE(ar)' % year
+    query = 'AFFILORG("faculty of medical technology" "mahidol university")' \
+                'AND PUBYEAR IS %s' % year
 
     params = {'apiKey': API_KEY, 'query': query}
     apikey = {'apiKey' : API_KEY}
@@ -110,6 +110,8 @@ def update(year):
     total_results = int(r.json()['search-results']['opensearch:totalResults'])
     page = 0
     article_no = 0
+
+    print('Total articles %d' % total_results)
 
     for start in range(0, total_results+1, ITEM_PER_PAGE):
         page += 1
