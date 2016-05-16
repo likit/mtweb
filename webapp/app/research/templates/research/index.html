@@ -53,7 +53,7 @@
         .transition().duration(350)
         .call(chart)
         .style({'width': width, 'height': height});
-        nv.utils.windowResize(chart.update);
+        nv.utils.windowResize(function() { chart.update() });
 
         return chart;
     });
@@ -63,11 +63,25 @@
 {% block page_content %}
     <div class="container">
         <div class="row">
-            <h1>Research Article in {{ year }}</h1>
-            <h3>Research funding {{ funding_years.get(year|string, 'N/A') }} Baht</h3>
-            <div id="fundings"><svg></svg></div>
-            <div id="pub_per_month_chart"><svg></svg></div>
-            <div>
+            <h1>Research Overview Year {{ year }}</h1>
+            {% if fundings|length > 0 %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3>Research Funding</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="alert alert-success"><h4>Total {{ total_year_funding }} Million Baht. Approximately {{ pub_cost }} baht/paper.</h4></div>
+                    <div id="fundings"><svg></svg></div>
+                </div>
+            </div>
+            {% endif %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3>Research Articles</h3>
+                </div>
+                <div class="panel-body">
+                    <div id="pub_per_month_chart"><svg></svg></div>
+                </div>
                 <table class="table table-striped">
                     <thead>
                         <th>No.</th>
