@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block page_content %}
+    <div class="container">
+        <div class="row">
+            <h1>Stakeholder Graduate Evaluation Result Summary.</h1>
+            {# <div class="alert alert-danger"> #}
+            {#     <strong>Warning: </strong>You may have wondered into the dangerous zone of the system. Please step back unless you are an authorized users. Proceeding without permission may incur a serious legal complication. #}
+            {# </div> #}
+            <div>
+                <table class="table table-striped">
+                    <thead>
+                        <th>Year</th>
+                        <th>Number</th>
+                        {% for q in questions %}
+                            <th>{{ q }}</th>
+                        {% endfor %}
+                    </thead>
+                    <tbody>
+                        {% for y in years %}
+                        <tr><td>{{ y }}</td><td>{{ data[y][0].num }}</td>
+                            {% for d in data[y] %}
+                            <td {% if d.answer_avg > 3.5 %}class="alert alert-success"{% else %} class="alert alert-danger" {% endif %}>{{d.answer_avg|round(2)}}</td>
+                            {% endfor %}
+                        {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block page_content %}
+    <div class="container">
+        <div class="row">
+            <h1>Wellrounded Scholar Survey Result Summary.</h1>
+            {# <div class="alert alert-danger"> #}
+            {#     <strong>Warning: </strong>You may have wondered into the dangerous zone of the system. Please step back unless you are an authorized users. Proceeding without permission may incur a serious legal complication. #}
+            </div>
+            <div>
+                <table class="table">
+                    <thead>
+                        <th>Year</th>
+                        <th>Number</th>
+                        {% for q in questions %}
+                        <th>{{ q }}</th>
+                        {% endfor %}
+                    </thead>
+                    <tbody>
+                        {% for y in years %}
+                        <tr><td>{{ y }}</td>
+                            <td>{{data[y][0].num}}</td>
+                            <td>{{data[y][0].answer_avg|round(2)}}</td>
+                            <td>{{data[y][1].answer_avg|round(2)}}</td>
+                            <td>{{data[y][2].answer_avg|round(2)}}</td>
+                            <td>{{data[y][3].answer_avg|round(2)}}</td>
+                            <td>{{data[y][4].answer_avg|round(2)}}</td>
+                            <td>{{data[y][5].answer_avg|round(2)}}</td>
+                            <td {% if data[y][6].answer_avg > 3.5 %} class="alert alert-success" {% else %} class="alert alert-danger" {% endif %}>{{data[y][6].answer_avg|round(2)}}
+                                {% if data[y][6].answer_avg > data[y][0].answer_avg %}
+                                <span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span>
+                                {% else %}
+                                <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>
+                                {% endif %}
+                            </td>
+                            <td {% if data[y][7].answer_avg > 3.5 %} class="alert alert-success" {% else %} class="alert alert-danger" {% endif %}>{{data[y][7].answer_avg|round(2)}}
+                                {% if data[y][7].answer_avg > data[y][1].answer_avg %}
+                                <span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span>
+                                {% else %}
+                                <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>
+                                {% endif %}
+                            </td>
+                            <td {% if data[y][8].answer_avg > 3.5 %} class="alert alert-success" {% else %} class="alert alert-danger" {% endif %}>{{data[y][8].answer_avg|round(2)}}
+                                {% if data[y][8].answer_avg > data[y][2].answer_avg %}
+                                <span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span>
+                                {% else %}
+                                <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>
+                                {% endif %}
+                            </td>
+                            <td {% if data[y][9].answer_avg > 3.5 %} class="alert alert-success" {% else %} class="alert alert-danger" {% endif %}>{{data[y][9].answer_avg|round(2)}}
+                                {% if data[y][9].answer_avg > data[y][3].answer_avg %}
+                                <span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span>
+                                {% else %}
+                                <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>
+                                {% endif %}
+                            </td>
+                            <td {% if data[y][10].answer_avg > 3.5 %} class="alert alert-success" {% else %} class="alert alert-danger" {% endif %}>{{data[y][10].answer_avg|round(2)}}
+                                {% if data[y][10].answer_avg > data[y][4].answer_avg %}
+                                <span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span>
+                                {% else %}
+                                <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>
+                                {% endif %}
+                            </td>
+                            <td {% if data[y][11].answer_avg > 3.5 %} class="alert alert-success" {% else %} class="alert alert-danger" {% endif %}>{{data[y][11].answer_avg|round(2)}}
+                                {% if data[y][11].answer_avg > data[y][5].answer_avg %}
+                                <span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span>
+                                {% else %}
+                                <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
