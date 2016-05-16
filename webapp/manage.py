@@ -1,10 +1,12 @@
 #! /usr/bin/env python
 
 import os
+from app.utils import scopus
+from app.utils.research import funding
 from app import create_app, db
 from app.models import (User, SystemRole, Department, FacultyInfo,
                             RoomDirectory, Building, Job, Contact,
-                            Education, Degree, ForumRole)
+                            Education, Degree, ForumRole, AcademicPosition)
 from flask.ext.script import Manager, Shell, Server
 from flask.ext.migrate import Migrate, MigrateCommand
 
@@ -25,7 +27,16 @@ def make_shell_context():
                     Contact=Contact,
                     Education=Education,
                     Degree=Degree,
+                    AcademicPosition=AcademicPosition,
                 )
+
+@manager.command
+def update_scopus(year):
+    '''
+    Update the Scopus research publication database.
+    '''
+    scopus.update(year)
+
 
 manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command("db", MigrateCommand)
