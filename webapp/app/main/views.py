@@ -4,6 +4,7 @@ from flask import (Blueprint, render_template,
 from app.models import (SystemPermission, User, Department,
                         UserType, AcademicPosition, ForumPermission,
                         Title, Job, RoomDirectory, FacultyInfo, Contact)
+from app.research.models import ScopusAuthor
 from flask.ext.login import login_required, current_user
 from .forms import EditProfileForm, AdminEditProfileForm
 from app import db
@@ -90,9 +91,16 @@ def department(did=None):
     '''
     if did:
         department = Department.query.get(did)
+        researchers = {}
         if department:
+            for member in department.members:
+                author = ScopusAuthor.query.filter_by(
+                            given_name=member.en_firstname,
+                            surname=member.en_lastname).first()
+                if author:
+                    researchers[member.en_lastname] = len(author.abstracts)
             return render_template('main/department.html',
-                    department=department)
+                    department=department, researchers=researchers)
         else:
             return "Department ID not found."
     else:
@@ -142,6 +150,7 @@ def edit_profile_by_admin(email=None):
             form.job.default = user.job.id or ''
             form.office.default = user.contact.office.id
             form.user_type.default = user.user_type.name
+            form.department_head = user.faculty_info.department_head
             form.process()
 
             # Other fields
@@ -210,13 +219,13 @@ def _update_user_data(form, user=None):
         if not user.faculty_info:
             user.faculty_info = FacultyInfo(
                     car_license_plate=form.car_license_plate.data,
-                    department_head=False,
+                    department_head=form.department_head.data,
                     academic_position=academic_position,
                     )
         else:
             user.faculty_info.car_license_plate = \
                     form.car_license_plate.data
-            user.faculty_info.department_head = False
+            user.faculty_info.department_head = form.department_head.data
             user.faculty_info.academic_position = academic_position
 
         office = RoomDirectory.query.get(form.office.data)
