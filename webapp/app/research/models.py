@@ -9,11 +9,11 @@ author_abstracts = db.Table('author_abstracts',
         db.Column('abstract_id', db.Integer,
             db.ForeignKey('scopus_abstracts.id')))
 
-area_abstracts = db.Table('area_abstracts',
-        db.Column('area_id', db.Integer,
-            db.ForeignKey('scopus_areas.id')),
-        db.Column('abstract_id', db.Integer,
-            db.ForeignKey('scopus_abstracts.id')))
+# area_abstracts = db.Table('area_abstracts',
+#         db.Column('area_id', db.Integer,
+#             db.ForeignKey('scopus_areas.id')),
+#         db.Column('abstract_id', db.Integer,
+#             db.ForeignKey('scopus_abstracts.id')))
 
 class ScopusAffiliation(db.Model):
     __tablename__ = 'scopus_affiliations'
@@ -59,6 +59,7 @@ class ScopusAuthor(db.Model):
 class ScopusAbstract(db.Model):
     __tablename__ = 'scopus_abstracts'
     id = db.Column(db.Integer(), primary_key=True)
+    # area_id = db.Column(db.Integer(), db.ForeignKey('scopus_areas.id'))
     url = db.Column(db.Text())
     identifier = db.Column(db.String(64))
     pii = db.Column(db.String(64))
@@ -76,18 +77,18 @@ class ScopusAbstract(db.Model):
                                 (self.title[:20], self.doi)
 
 
-class ScopusArea(db.Model):
-    __tablename__ = 'scopus_areas'
-    id = db.Column(db.Integer(), primary_key=True)
-    abstract_id = db.Column(db.Integer(),
-                    db.ForeignKey('scopus_abstracts.id'))
-    area = db.Column(db.String(255))
-    abstracts = db.relationship('ScopusAbstract',
-                        secondary=area_abstracts,
-                        backref=db.backref('areas', lazy='dynamic'))
-
-    def __repr__(self):
-        return "<ScopusArea area=%s>" % (self.area)
+# class ScopusArea(db.Model):
+#     __tablename__ = 'scopus_areas'
+#     id = db.Column(db.Integer(), primary_key=True)
+#     abstract_id = db.Column(db.Integer(),
+#                     db.ForeignKey('scopus_abstracts.id'))
+#     area = db.Column(db.String(255))
+#     abstracts = db.relationship('ScopusAbstract',
+#                         secondary=area_abstracts,
+#                         backref=db.backref('areas', lazy='dynamic'))
+# 
+#     def __repr__(self):
+#         return "<ScopusArea area=%s>" % (self.area)
 
 
 class FundingAgency(db.Model):
