@@ -46,9 +46,10 @@
 
 {% block page_content %}
 <h1>{{ department.en_name }}<br><small>{{ department.th_name }}</small></h1>
-    <h3>Staff</h3>
+    <h3>Head</h3>
     <ul class="dept-members">
     {% for member in department.members %}
+    {% if member.faculty_info.department_head %}
     <li class="member">
         <div>
             <img class="profile-thumbnail" height="90px" src="{{ member.about_me }}">
@@ -72,8 +73,51 @@
             Room {{ member.contact.office.roomid }}, {{ member.contact.office.building.en_name }}<br>
             <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
             <a class="alert-link" href="mailto:#">{{ member.email }}</a>
+            <br>
+            {% if researchers[member.en_lastname] %}
+            <a href="{{ url_for('research.profile', firstname=member.en_firstname, lastname=member.en_lastname) }}">
+                  Research <span class="badge">{{ researchers[member.en_lastname] }}</span></a>
+            {% endif %}
         </div>
     </li>
+    {% endif %}
+    {% endfor %}
+    </ul>
+    <h3>Staff</h3>
+    <ul class="dept-members">
+    {% for member in department.members %}
+    {% if not member.faculty_info.department_head %}
+    <li class="member">
+        <div>
+            <img class="profile-thumbnail" height="90px" src="{{ member.about_me }}">
+        </div>
+        <div class="member-contact">
+            <strong><a class="alert-link" href="{{ url_for('main.user', email=member.email) }}">{{ member.title.en_name }} {{ member.en_firstname }} {{ member.en_lastname }}</a></strong>
+            {% if member.faculty_info.academic_position.en_title != "None" %}
+            ({{ member.faculty_info.academic_position.en_title }})<br>
+            {% else %}
+            ({{ member.job.en_name }})<br>
+            {% endif %}
+            <span class="glyphicon glyphicon-phone-alt" aria-hidden="true"></span>
+            Office: {{ member.contact.office.phone }}
+            {% if member.contact.fax %}
+                Fax: {{ member.contact.fax }}{% endif %}
+            {% if member.contact.mobile_phone %}
+                Mobile: {{ member.contact.mobile_phone }}
+            {% endif %}
+            <br>
+            <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+            Room {{ member.contact.office.roomid }}, {{ member.contact.office.building.en_name }}<br>
+            <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
+            <a class="alert-link" href="mailto:#">{{ member.email }}</a>
+            <br>
+            {% if researchers[member.en_lastname] %}
+            <a href="{{ url_for('research.profile', firstname=member.en_firstname, lastname=member.en_lastname) }}">
+                  Research <span class="badge">{{ researchers[member.en_lastname] }}</span></a>
+            {% endif %}
+        </div>
+    </li>
+    {% endif %}
     {% endfor %}
     </ul>
 {% endblock %}
