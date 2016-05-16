@@ -2,27 +2,16 @@
 {% block page_content %}
     <div class="container">
         <div class="row">
-            <h1>Welcome to MUMT Backoffice Services: {{ dept }}</h1>
-            <table class="table">
-                <thead>
-                <th>No.</th>
-                <th>mimeType</th>
-                <th>kind</th>
-                <th>id</th>
-                <th>name</th>
-                </thead>
-                <tbody>
-                    {% for f in files['files'] %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td>{{ f['mimeType'] }}</td>
-                            <td>{{ f['kind'] }}</td>
-                            <td><a href="{{ url_for('backoffice.loadsheet', id=f['id']) }}">{{ f['id'] }}</a></td>
-                            <td>{{ f['name'] }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <h1>Welcome to MUMT Backoffice Services.</h1>
+            <div class="alert alert-danger">
+                <strong>Warning: </strong>You may have wondered into the dangerous zone of the system. Please step back unless you are an authorized users. Proceeding without permission may incur a serious legal complication.
+            </div>
+            <p>Choose actions below.</p>
+            <ul>
+                <li><a href="{{ url_for('backoffice.update_research_funding') }}">Update fundings from Google sheet.</a></li>
+                <li><a href="{{ url_for('backoffice.update_stakeholder_eval') }}">Update graduate evaluation data from Google sheet</a></li>
+                <li><a href="{{ url_for('backoffice.update_wellrounded') }}">Update wellrounded data from Google sheet</a></li>
+            </ul>
         </div>
     </div>
 {% endblock %}
