@@ -46,4 +46,5 @@ class AdminEditProfileForm(Form):
     mobile_phone = StringField('Mobile phone', validators=[Length(0,24)])
     fax = StringField('Fax', validators=[Length(0,24)])
     user_type = SelectField('User Type', validators=[DataRequired()])
+    department_head = BooleanField('Dept. head')
     submit = SubmitField('Submit')
